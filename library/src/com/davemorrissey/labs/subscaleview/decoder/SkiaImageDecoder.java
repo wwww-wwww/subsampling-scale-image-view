@@ -57,8 +57,6 @@ public class SkiaImageDecoder implements ImageDecoder {
         } else if (uriString.startsWith(ASSET_PREFIX)) {
             String assetName = uriString.substring(ASSET_PREFIX.length());
             bitmap = BitmapFactory.decodeStream(context.getAssets().open(assetName), null, options);
-        } else if (uriString.startsWith(FILE_PREFIX)) {
-            bitmap = BitmapFactory.decodeFile(uriString.substring(FILE_PREFIX.length()), options);
         } else {
             InputStream inputStream = null;
             try {
