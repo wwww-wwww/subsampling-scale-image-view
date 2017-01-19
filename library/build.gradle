@@ -5,7 +5,7 @@ version = '3.6.0'
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile 'com.android.support:support-annotations:25.0.1'
-    compile 'com.github.suckgamony.RapidDecoder:library:7cdfca4'
+    compile 'com.github.inorichi.RapidDecoder:library:7200cc4'
     compile 'com.github.seven332:image:7a1b4cb'
 }
 

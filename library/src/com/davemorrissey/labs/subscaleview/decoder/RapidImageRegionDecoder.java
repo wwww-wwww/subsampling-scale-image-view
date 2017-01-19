@@ -33,7 +33,7 @@ public class RapidImageRegionDecoder implements ImageRegionDecoder {
     @Override
     public synchronized Bitmap decodeRegion(Rect sRect, int sampleSize) {
         try {
-            return decoder
+            return decoder.reset()
                     .config(Bitmap.Config.RGB_565)
                     .region(sRect)
                     .scale(sRect.width() / sampleSize, sRect.height() / sampleSize)
