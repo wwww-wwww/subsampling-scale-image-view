@@ -19,7 +19,6 @@ package com.davemorrissey.labs.subscaleview;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -30,13 +29,11 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build.VERSION;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.support.annotation.AnyThread;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
@@ -66,6 +63,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
+
+import eu.kanade.tachimage.Tachimage;
 
 /**
  * Displays an image subsampled as necessary to avoid loading too much image data into memory. After a pinch to zoom in,
@@ -180,6 +179,9 @@ public class SubsamplingScaleImageView extends View {
 
     // Minimum scale type
     private int minimumScaleType = SCALE_TYPE_CENTER_INSIDE;
+
+    // Whether to crop borders.
+    private boolean cropBorders = false;
 
     // overrides for the dimensions of the generated tiles
     public static int TILE_SIZE_AUTO = Integer.MAX_VALUE;
@@ -960,7 +962,7 @@ public class SubsamplingScaleImageView extends View {
         }
 
         // When using tiles, on first render with no tile map ready, initialise it and kick off async base image loading.
-        if (tileMap == null && decoder != null) {
+        if (tileMap == null && decoder != null && !cropBorders) {
             initialiseBaseLayer(getMaxBitmapDimensions(canvas));
         }
 
@@ -1245,7 +1247,7 @@ public class SubsamplingScaleImageView extends View {
             BitmapLoadTask task = new BitmapLoadTask(this, getContext(), bitmapDecoderFactory, uri, false);
             execute(task);
 
-        } else {
+        } else if (!cropBorders) {
 
             initialiseTileMap(maxTileDimensions);
 
@@ -1256,6 +1258,16 @@ public class SubsamplingScaleImageView extends View {
             }
             refreshRequiredTiles(true);
 
+        } else {
+            Tile tile = new Tile();
+            tile.sampleSize = fullImageSampleSize;
+            tile.visible = true;
+            tile.vRect = new Rect(0, 0, 0, 0);
+            tile.sRect = new Rect(0, 0, sWidth(), sHeight());
+            tile.fileSRect = new Rect(tile.sRect);
+
+            TilesCropInitTask task = new TilesCropInitTask(this, decoder, tile);
+            execute(task);
         }
 
     }
@@ -1595,6 +1607,91 @@ public class SubsamplingScaleImageView extends View {
         requestLayout();
     }
 
+    private static class TilesCropInitTask extends AsyncTask<Void, Void, Bitmap> {
+        private final WeakReference<SubsamplingScaleImageView> viewRef;
+        private final WeakReference<ImageRegionDecoder> decoderRef;
+        private final Tile tile;
+        private Exception exception;
+
+        TilesCropInitTask(SubsamplingScaleImageView view, ImageRegionDecoder decoder, Tile tile) {
+            this.viewRef = new WeakReference<>(view);
+            this.decoderRef = new WeakReference<>(decoder);
+            this.tile = tile;
+            tile.loading = true;
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... params) {
+            try {
+                SubsamplingScaleImageView view = viewRef.get();
+                ImageRegionDecoder decoder = decoderRef.get();
+                if (decoder != null && view != null && decoder.isReady()) {
+                    view.debug("TilesCropInitTask.doInBackground, tile.sRect=%s, tile.sampleSize=%d", tile.sRect, tile.sampleSize);
+                    synchronized (view.decoderLock) {
+                        Bitmap bitmap = decoder.decodeRegion(tile.fileSRect, tile.sampleSize);
+
+                        if (bitmap != null) {
+                            Rect r = Tachimage.findBorders(bitmap);
+                            if (r != null) {
+                                int s = tile.sampleSize;
+
+                                // Scale rect to full res image and apply offset.
+                                tile.fileSRect.set(r.left * s, r.top * s, r.right * s, r.bottom * s);
+
+                                // Crop the image to reuse it.
+                                Tachimage.cropBitmap(bitmap, r);
+                            }
+                        }
+                        return bitmap;
+                    }
+                } else {
+                    tile.loading = false;
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to decode tile", e);
+                this.exception = e;
+            } catch (OutOfMemoryError e) {
+                Log.e(TAG, "Failed to decode tile - OutOfMemoryError", e);
+                this.exception = new RuntimeException(e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            final SubsamplingScaleImageView view = viewRef.get();
+            if (view != null) {
+                if (bitmap != null) {
+                    view.sWidth = tile.fileSRect.width();
+                    view.sHeight = tile.fileSRect.height();
+                    int offsetX = tile.fileSRect.left;
+                    int offsetY = tile.fileSRect.top;
+
+                    view.initialiseTileMap(new Point(view.maxTileWidth, view.maxTileHeight));
+
+                    for (List<Tile> tiles : view.tileMap.values()) {
+                        for (Tile tile : tiles) {
+                            tile.fileSRect.offset(offsetX, offsetY);
+                        }
+                    }
+
+                    List<Tile> tiles = view.tileMap.get(view.fullImageSampleSize);
+                    if (tiles.size() == 1) {
+                        tiles.get(0).bitmap = bitmap;
+                    }
+                    view.refreshRequiredTiles(true);
+
+                    view.checkReady();
+                    view.checkImageLoaded();
+                    view.invalidate();
+                    view.requestLayout();
+                } else {
+                    view.onImageEventListener.onImageLoadError(exception);
+                }
+            }
+        }
+    }
+
     /**
      * Async task used to load images without blocking the UI thread.
      */
@@ -1620,11 +1717,6 @@ public class SubsamplingScaleImageView extends View {
                 if (decoder != null && tile != null && view != null && decoder.isReady() && tile.visible) {
                     view.debug("TileLoadTask.doInBackground, tile.sRect=%s, tile.sampleSize=%d", tile.sRect, tile.sampleSize);
                     synchronized (view.decoderLock) {
-                        // Update tile's file sRect according to rotation
-                        view.fileSRect(tile.sRect, tile.fileSRect);
-                        if (view.sRegion != null) {
-                            tile.fileSRect.offset(view.sRegion.left, view.sRegion.top);
-                        }
                         return decoder.decodeRegion(tile.fileSRect, tile.sampleSize);
                     }
                 } else if (tile != null) {
@@ -1706,7 +1798,17 @@ public class SubsamplingScaleImageView extends View {
                 SubsamplingScaleImageView view = viewRef.get();
                 if (context != null && decoderFactory != null && view != null) {
                     view.debug("BitmapLoadTask.doInBackground");
-                    bitmap = decoderFactory.make().decode(context, source);
+                    Bitmap bitmap = decoderFactory.make().decode(context, source);
+
+                    if (view.cropBorders) {
+                        Tachimage.findBordersAndCrop(bitmap);
+
+                        view.sWidth = bitmap.getWidth();
+                        view.sHeight = bitmap.getHeight();
+                    }
+
+                    this.bitmap = bitmap;
+
                     return view.getExifOrientation(context, sourceUri);
                 }
             } catch (Exception e) {
@@ -1798,49 +1900,7 @@ public class SubsamplingScaleImageView extends View {
      */
     @AnyThread
     private int getExifOrientation(Context context, String sourceUri) {
-        int exifOrientation = ORIENTATION_0;
-        if (sourceUri.startsWith(ContentResolver.SCHEME_CONTENT)) {
-            Cursor cursor = null;
-            try {
-                String[] columns = { MediaStore.Images.Media.ORIENTATION };
-                cursor = context.getContentResolver().query(Uri.parse(sourceUri), columns, null, null, null);
-                if (cursor != null) {
-                    if (cursor.moveToFirst()) {
-                        int orientation = cursor.getInt(0);
-                        if (VALID_ORIENTATIONS.contains(orientation) && orientation != ORIENTATION_USE_EXIF) {
-                            exifOrientation = orientation;
-                        } else {
-                            Log.w(TAG, "Unsupported orientation: " + orientation);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                Log.w(TAG, "Could not get orientation of image from media store");
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
-            }
-        } else if (sourceUri.startsWith(ImageSource.FILE_SCHEME) && !sourceUri.startsWith(ImageSource.ASSET_SCHEME)) {
-            try {
-                ExifInterface exifInterface = new ExifInterface(sourceUri.substring(ImageSource.FILE_SCHEME.length() - 1));
-                int orientationAttr = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                if (orientationAttr == ExifInterface.ORIENTATION_NORMAL || orientationAttr == ExifInterface.ORIENTATION_UNDEFINED) {
-                    exifOrientation = ORIENTATION_0;
-                } else if (orientationAttr == ExifInterface.ORIENTATION_ROTATE_90) {
-                    exifOrientation = ORIENTATION_90;
-                } else if (orientationAttr == ExifInterface.ORIENTATION_ROTATE_180) {
-                    exifOrientation = ORIENTATION_180;
-                } else if (orientationAttr == ExifInterface.ORIENTATION_ROTATE_270) {
-                    exifOrientation = ORIENTATION_270;
-                } else {
-                    Log.w(TAG, "Unsupported EXIF orientation: " + orientationAttr);
-                }
-            } catch (Exception e) {
-                Log.w(TAG, "Could not get EXIF orientation of image");
-            }
-        }
-        return exifOrientation;
+        return ORIENTATION_0;
     }
 
     private void execute(AsyncTask<Void, Void, ?> asyncTask) {
@@ -1909,6 +1969,15 @@ public class SubsamplingScaleImageView extends View {
             this.sPendingCenter = state.getCenter();
             invalidate();
         }
+    }
+
+    /**
+     * Set border crop of non-filled (white) content.
+     *
+     * @param cropBorders Whether to crop image borders.
+     */
+    public void setCropBorders(boolean cropBorders) {
+        this.cropBorders = cropBorders;
     }
 
     /**
