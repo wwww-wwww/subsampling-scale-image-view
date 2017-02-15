@@ -7,7 +7,7 @@ dependencies {
     compile 'com.android.support:support-annotations:25.0.1'
     compile 'com.github.inorichi.RapidDecoder:library:7200cc4'
     compile 'com.github.seven332:image:7a1b4cb'
-    compile 'eu.kanade.tachimage:tachimage:0.1'
+    compile 'eu.kanade.tachimage:tachimage:0.5'
 }
 
 android {
