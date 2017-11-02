@@ -1685,7 +1685,7 @@ public class SubsamplingScaleImageView extends View {
                     view.checkImageLoaded();
                     view.invalidate();
                     view.requestLayout();
-                } else {
+                } else if (exception != null && view.onImageEventListener != null) {
                     view.onImageEventListener.onImageLoadError(exception);
                 }
             }
