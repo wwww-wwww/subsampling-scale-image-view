@@ -1247,7 +1247,7 @@ public class SubsamplingScaleImageView extends View {
             BitmapLoadTask task = new BitmapLoadTask(this, getContext(), bitmapDecoderFactory, uri, false);
             execute(task);
 
-        } else if (!cropBorders) {
+        } else if (!cropBorders || fullImageSampleSize < 1) {
 
             initialiseTileMap(maxTileDimensions);
 
