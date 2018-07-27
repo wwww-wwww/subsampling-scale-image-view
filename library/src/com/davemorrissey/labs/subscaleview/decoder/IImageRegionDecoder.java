@@ -4,8 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.net.Uri;
 
+import com.davemorrissey.labs.subscaleview.provider.InputProvider;
 import com.hippo.image.BitmapDecoder;
 import com.hippo.image.BitmapRegionDecoder;
 
@@ -16,10 +16,10 @@ public class IImageRegionDecoder implements ImageRegionDecoder {
     private BitmapRegionDecoder decoder = null;
 
     @Override
-    public Point init(Context context, Uri uri) throws Exception {
+    public Point init(Context context, InputProvider provider) throws Exception {
         InputStream inputStream = null;
         try {
-            inputStream = context.getContentResolver().openInputStream(uri);
+            inputStream = provider.openStream();
             decoder = BitmapRegionDecoder.newInstance(inputStream);
         } finally {
             if (inputStream != null) {

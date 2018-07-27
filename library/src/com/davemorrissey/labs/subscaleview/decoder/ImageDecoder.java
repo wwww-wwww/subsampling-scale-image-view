@@ -2,9 +2,8 @@ package com.davemorrissey.labs.subscaleview.decoder;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.net.Uri;
+
+import com.davemorrissey.labs.subscaleview.provider.InputProvider;
 
 /**
  * Interface for image decoding classes, allowing the default {@link android.graphics.BitmapRegionDecoder}
@@ -19,10 +18,10 @@ public interface ImageDecoder {
      * Asset: file:///android_asset/picture.png
      * Resource: android.resource://com.example.app/drawable/picture
      * @param context Application context. A reference may be held, but must be cleared on recycle.
-     * @param uri URI of the image.
+     * @param provider Provider of the image.
      * @return Dimensions of the image.
      * @throws Exception if initialisation fails.
      */
-    Bitmap decode(Context context, Uri uri) throws Exception;
+    Bitmap decode(Context context, InputProvider provider) throws Exception;
 
 }

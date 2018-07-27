@@ -2,16 +2,16 @@ package com.davemorrissey.labs.subscaleview.decoder;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.graphics.*;
+import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.net.Uri;
-import android.text.TextUtils;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapRegionDecoder;
+import android.graphics.Point;
+import android.graphics.Rect;
+
+import com.davemorrissey.labs.subscaleview.provider.InputProvider;
 
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * Default implementation of {@link com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder}
@@ -29,47 +29,17 @@ public class SkiaImageRegionDecoder implements ImageRegionDecoder {
     private static final String RESOURCE_PREFIX = ContentResolver.SCHEME_ANDROID_RESOURCE + "://";
 
     @Override
-    public Point init(Context context, Uri uri) throws Exception {
-        String uriString = uri.toString();
-        if (uriString.startsWith(RESOURCE_PREFIX)) {
-            Resources res;
-            String packageName = uri.getAuthority();
-            if (context.getPackageName().equals(packageName)) {
-                res = context.getResources();
-            } else {
-                PackageManager pm = context.getPackageManager();
-                res = pm.getResourcesForApplication(packageName);
-            }
-
-            int id = 0;
-            List<String> segments = uri.getPathSegments();
-            int size = segments.size();
-            if (size == 2 && segments.get(0).equals("drawable")) {
-                String resName = segments.get(1);
-                id = res.getIdentifier(resName, "drawable", packageName);
-            } else if (size == 1 && TextUtils.isDigitsOnly(segments.get(0))) {
-                try {
-                    id = Integer.parseInt(segments.get(0));
-                } catch (NumberFormatException ignored) {
-                }
-            }
-
-            decoder = BitmapRegionDecoder.newInstance(context.getResources().openRawResource(id), false);
-        } else if (uriString.startsWith(ASSET_PREFIX)) {
-            String assetName = uriString.substring(ASSET_PREFIX.length());
-            decoder = BitmapRegionDecoder.newInstance(context.getAssets().open(assetName, AssetManager.ACCESS_RANDOM), false);
-        } else {
-            InputStream inputStream = null;
-            try {
-                ContentResolver contentResolver = context.getContentResolver();
-                inputStream = contentResolver.openInputStream(uri);
-                decoder = BitmapRegionDecoder.newInstance(inputStream, false);
-            } finally {
-                if (inputStream != null) {
-                    try { inputStream.close(); } catch (Exception e) { }
-                }
+    public Point init(Context context, InputProvider provider) throws Exception {
+        InputStream inputStream = null;
+        try {
+            inputStream = provider.openStream();
+            decoder = BitmapRegionDecoder.newInstance(inputStream, false);
+        } finally {
+            if (inputStream != null) {
+                try { inputStream.close(); } catch (Exception e) { }
             }
         }
+
         return new Point(decoder.getWidth(), decoder.getHeight());
     }
 

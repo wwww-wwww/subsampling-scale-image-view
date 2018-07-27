@@ -16,7 +16,6 @@ limitations under the License.
 
 package com.davemorrissey.labs.subscaleview;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -29,7 +28,6 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build.VERSION;
 import android.os.Handler;
@@ -52,6 +50,9 @@ import com.davemorrissey.labs.subscaleview.decoder.ImageDecoder;
 import com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder;
 import com.davemorrissey.labs.subscaleview.decoder.SkiaImageDecoder;
 import com.davemorrissey.labs.subscaleview.decoder.SkiaImageRegionDecoder;
+import com.davemorrissey.labs.subscaleview.provider.InputProvider;
+import com.davemorrissey.labs.subscaleview.provider.ResourceInputProvider;
+import com.davemorrissey.labs.subscaleview.provider.UriInputProvider;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -150,8 +151,8 @@ public class SubsamplingScaleImageView extends View {
     // Specifies if a cache handler is also referencing the bitmap. Do not recycle if so.
     private boolean bitmapIsCached;
 
-    // Uri of full size image
-    private Uri uri;
+    // Provider of full size image
+    private InputProvider provider;
 
     // Sample size used to display the whole image when fully zoomed out
     private int fullImageSampleSize;
@@ -221,9 +222,6 @@ public class SubsamplingScaleImageView extends View {
     private int sOrientation;
     private Rect sRegion;
     private Rect pRegion;
-
-    // Vertical pagers/scrollers should enable this
-    private boolean isVerticalScrollingParent;
 
     // Is two-finger zooming in progress
     private boolean isZooming;
@@ -428,11 +426,15 @@ public class SubsamplingScaleImageView extends View {
                 this.bitmapIsCached = previewSource.isCached();
                 onPreviewLoaded(previewSource.getBitmap());
             } else {
-                Uri uri = previewSource.getUri();
-                if (uri == null && previewSource.getResource() != null) {
-                    uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getContext().getPackageName() + "/" + previewSource.getResource());
+                InputProvider provider = previewSource.getProvider();
+                if (provider == null && previewSource.getUri() != null) {
+                    provider = new UriInputProvider(getContext(), previewSource.getUri());
                 }
-                BitmapLoadTask task = new BitmapLoadTask(this, getContext(), bitmapDecoderFactory, uri, true);
+                if (provider == null && previewSource.getResource() != null) {
+                    provider = new ResourceInputProvider(getContext(), previewSource.getResource());
+                }
+
+                BitmapLoadTask task = new BitmapLoadTask(this, getContext(), bitmapDecoderFactory, provider, true);
                 execute(task);
             }
         }
@@ -443,17 +445,20 @@ public class SubsamplingScaleImageView extends View {
             onImageLoaded(imageSource.getBitmap(), ORIENTATION_0, imageSource.isCached());
         } else {
             sRegion = imageSource.getSRegion();
-            uri = imageSource.getUri();
-            if (uri == null && imageSource.getResource() != null) {
-                uri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getContext().getPackageName() + "/" + imageSource.getResource());
+            provider = imageSource.getProvider();
+            if (provider == null && imageSource.getUri() != null) {
+                provider = new UriInputProvider(getContext(), imageSource.getUri());
+            }
+            if (provider == null && imageSource.getResource() != null) {
+                provider = new ResourceInputProvider(getContext(), imageSource.getResource());
             }
             if (imageSource.getTile() || sRegion != null) {
                 // Load the bitmap using tile decoding.
-                TilesInitTask task = new TilesInitTask(this, getContext(), regionDecoderFactory, uri);
+                TilesInitTask task = new TilesInitTask(this, getContext(), regionDecoderFactory, provider);
                 execute(task);
             } else {
                 // Load the bitmap as a single image.
-                BitmapLoadTask task = new BitmapLoadTask(this, getContext(), bitmapDecoderFactory, uri, false);
+                BitmapLoadTask task = new BitmapLoadTask(this, getContext(), bitmapDecoderFactory, provider, false);
                 execute(task);
             }
         }
@@ -489,7 +494,7 @@ public class SubsamplingScaleImageView extends View {
         matrix = null;
         sRect = null;
         if (newImage) {
-            uri = null;
+            provider = null;
             if (decoder != null) {
                 synchronized (decoderLock) {
                     decoder.recycle();
@@ -825,32 +830,19 @@ public class SubsamplingScaleImageView extends View {
                             float lastX = vTranslate.x;
                             float lastY = vTranslate.y;
                             fitToBounds(true);
-                            if (!isVerticalScrollingParent) {
-                                boolean atXEdge = lastX != vTranslate.x;
-                                boolean edgeXSwipe = atXEdge && dx > dy && !isPanning;
-                                boolean yPan = lastY == vTranslate.y && dy > offset * 3;
-                                if (!edgeXSwipe && (!atXEdge || yPan || isPanning)) {
-                                    isPanning = true;
-                                } else if (dx > offset) {
-                                    // Haven't panned the image, and we're at the left or right edge. Switch to page swipe.
-                                    maxTouchCount = 0;
-                                    handler.removeMessages(MESSAGE_LONG_CLICK);
-                                    requestDisallowInterceptTouchEvent(false);
-                                }
-                            } else {
-                                boolean atYEdge = lastY != vTranslate.y;
-                                boolean edgeYSwipe = atYEdge && dy > dx && !isPanning;
-                                boolean xPan = lastX == vTranslate.x && dx > offset * 3;
-                                if (!edgeYSwipe && (!atYEdge || xPan || isPanning)) {
-                                    isPanning = true;
-                                } else if (dy > offset) {
-                                    // Haven't panned the image, and we're at the left or right edge. Switch to page swipe.
-                                    maxTouchCount = 0;
-                                    handler.removeMessages(MESSAGE_LONG_CLICK);
-                                    requestDisallowInterceptTouchEvent(false);
-                                }
+                            boolean atXEdge = lastX != vTranslate.x;
+                            boolean atYEdge = lastY != vTranslate.y;
+                            boolean edgeXSwipe = atXEdge && dx > dy && !isPanning;
+                            boolean edgeYSwipe = atYEdge && dy > dx && !isPanning;
+                            boolean yPan = lastY == vTranslate.y && dy > offset * 3;
+                            if (!edgeXSwipe && !edgeYSwipe && (!atXEdge || !atYEdge || yPan || isPanning)) {
+                                isPanning = true;
+                            } else if (dx > offset || dy > offset) {
+                                // Haven't panned the image, and we're at the left or right edge. Switch to page swipe.
+                                maxTouchCount = 0;
+                                handler.removeMessages(MESSAGE_LONG_CLICK);
+                                requestDisallowInterceptTouchEvent(false);
                             }
-
                             if (!panEnabled) {
                                 vTranslate.x = vTranslateStart.x;
                                 vTranslate.y = vTranslateStart.y;
@@ -1244,10 +1236,10 @@ public class SubsamplingScaleImageView extends View {
             // Use BitmapDecoder for better image support.
             decoder.recycle();
             decoder = null;
-            BitmapLoadTask task = new BitmapLoadTask(this, getContext(), bitmapDecoderFactory, uri, false);
+            BitmapLoadTask task = new BitmapLoadTask(this, getContext(), bitmapDecoderFactory, provider, false);
             execute(task);
 
-        } else if (!cropBorders || fullImageSampleSize < 1) {
+        } else if (!cropBorders) {
 
             initialiseTileMap(maxTileDimensions);
 
@@ -1524,36 +1516,34 @@ public class SubsamplingScaleImageView extends View {
         private final WeakReference<SubsamplingScaleImageView> viewRef;
         private final WeakReference<Context> contextRef;
         private final WeakReference<DecoderFactory<? extends ImageRegionDecoder>> decoderFactoryRef;
-        private final Uri source;
+        private final InputProvider provider;
         private ImageRegionDecoder decoder;
         private Exception exception;
 
-        TilesInitTask(SubsamplingScaleImageView view, Context context, DecoderFactory<? extends ImageRegionDecoder> decoderFactory, Uri source) {
+        TilesInitTask(SubsamplingScaleImageView view, Context context, DecoderFactory<? extends ImageRegionDecoder> decoderFactory, InputProvider provider) {
             this.viewRef = new WeakReference<>(view);
             this.contextRef = new WeakReference<>(context);
             this.decoderFactoryRef = new WeakReference<DecoderFactory<? extends ImageRegionDecoder>>(decoderFactory);
-            this.source = source;
+            this.provider = provider;
         }
 
         @Override
         protected int[] doInBackground(Void... params) {
             try {
-                String sourceUri = source.toString();
                 Context context = contextRef.get();
                 DecoderFactory<? extends ImageRegionDecoder> decoderFactory = decoderFactoryRef.get();
                 SubsamplingScaleImageView view = viewRef.get();
                 if (context != null && decoderFactory != null && view != null) {
                     view.debug("TilesInitTask.doInBackground");
                     decoder = decoderFactory.make();
-                    Point dimensions = decoder.init(context, source);
+                    Point dimensions = decoder.init(context, provider);
                     int sWidth = dimensions.x;
                     int sHeight = dimensions.y;
-                    int exifOrientation = view.getExifOrientation(context, sourceUri);
                     if (view.sRegion != null) {
                         sWidth = view.sRegion.width();
                         sHeight = view.sRegion.height();
                     }
-                    return new int[] { sWidth, sHeight, exifOrientation };
+                    return new int[] { sWidth, sHeight, ORIENTATION_0};
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Failed to initialise bitmap decoder", e);
@@ -1661,7 +1651,7 @@ public class SubsamplingScaleImageView extends View {
         protected void onPostExecute(Bitmap bitmap) {
             final SubsamplingScaleImageView view = viewRef.get();
             if (view != null) {
-                if (bitmap != null) {
+                if (bitmap != null && view.fullImageSampleSize != 0) {
                     view.sWidth = tile.fileSRect.width();
                     view.sHeight = tile.fileSRect.height();
                     int offsetX = tile.fileSRect.left;
@@ -1776,29 +1766,28 @@ public class SubsamplingScaleImageView extends View {
         private final WeakReference<SubsamplingScaleImageView> viewRef;
         private final WeakReference<Context> contextRef;
         private final WeakReference<DecoderFactory<? extends ImageDecoder>> decoderFactoryRef;
-        private final Uri source;
+        private final InputProvider provider;
         private final boolean preview;
         private Bitmap bitmap;
         private Exception exception;
 
-        BitmapLoadTask(SubsamplingScaleImageView view, Context context, DecoderFactory<? extends ImageDecoder> decoderFactory, Uri source, boolean preview) {
+        BitmapLoadTask(SubsamplingScaleImageView view, Context context, DecoderFactory<? extends ImageDecoder> decoderFactory, InputProvider provider, boolean preview) {
             this.viewRef = new WeakReference<>(view);
             this.contextRef = new WeakReference<>(context);
             this.decoderFactoryRef = new WeakReference<DecoderFactory<? extends ImageDecoder>>(decoderFactory);
-            this.source = source;
+            this.provider = provider;
             this.preview = preview;
         }
 
         @Override
         protected Integer doInBackground(Void... params) {
             try {
-                String sourceUri = source.toString();
                 Context context = contextRef.get();
                 DecoderFactory<? extends ImageDecoder> decoderFactory = decoderFactoryRef.get();
                 SubsamplingScaleImageView view = viewRef.get();
                 if (context != null && decoderFactory != null && view != null) {
                     view.debug("BitmapLoadTask.doInBackground");
-                    Bitmap bitmap = decoderFactory.make().decode(context, source);
+                    Bitmap bitmap = decoderFactory.make().decode(context, provider);
 
                     if (view.cropBorders) {
                         Tachimage.findBordersAndCrop(bitmap);
@@ -1809,7 +1798,7 @@ public class SubsamplingScaleImageView extends View {
 
                     this.bitmap = bitmap;
 
-                    return view.getExifOrientation(context, sourceUri);
+                    return ORIENTATION_0;
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Failed to load bitmap", e);
@@ -1894,14 +1883,6 @@ public class SubsamplingScaleImageView extends View {
         }
     }
 
-    /**
-     * Helper method for load tasks. Examines the EXIF info on the image file to determine the orientation.
-     * This will only work for external files, not assets, resources or other URIs.
-     */
-    @AnyThread
-    private int getExifOrientation(Context context, String sourceUri) {
-        return ORIENTATION_0;
-    }
 
     private void execute(AsyncTask<Void, Void, ?> asyncTask) {
         if (parallelLoadingEnabled && VERSION.SDK_INT >= 11) {
@@ -2728,13 +2709,6 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * Set vertical scroll mode to fix gestures
-     */
-    public void setVerticalScrollingParent(boolean isVerticalScrollingParent) {
-        this.isVerticalScrollingParent = isVerticalScrollingParent;
-    }
-
-    /**
      * Enables visual debugging, showing tile boundaries and sizes.
      */
     public final void setDebug(boolean debug) {
@@ -2746,7 +2720,7 @@ public class SubsamplingScaleImageView extends View {
      * @return If an image is currently set.
      */
     public boolean hasImage() {
-        return uri != null || bitmap != null;
+        return provider != null || bitmap != null;
     }
 
     /**

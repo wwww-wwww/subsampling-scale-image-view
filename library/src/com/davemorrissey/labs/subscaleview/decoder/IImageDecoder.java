@@ -2,8 +2,8 @@ package com.davemorrissey.labs.subscaleview.decoder;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
 
+import com.davemorrissey.labs.subscaleview.provider.InputProvider;
 import com.hippo.image.BitmapDecoder;
 
 import java.io.InputStream;
@@ -11,11 +11,11 @@ import java.io.InputStream;
 public class IImageDecoder implements ImageDecoder {
 
     @Override
-    public Bitmap decode(Context context, Uri uri) throws Exception {
+    public Bitmap decode(Context context, InputProvider provider) throws Exception {
         InputStream is = null;
-        Bitmap bitmap = null;
+        Bitmap bitmap;
         try {
-            is = context.getContentResolver().openInputStream(uri);
+            is = provider.openStream();
             bitmap = BitmapDecoder.decode(is, BitmapDecoder.CONFIG_RGB_565);
         } finally {
             if (is != null) {

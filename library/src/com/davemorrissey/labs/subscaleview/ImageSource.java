@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
 
+import com.davemorrissey.labs.subscaleview.provider.InputProvider;
+
 /**
  * Helper class used to set the source and additional attributes from a variety of sources. Supports
  * use of a bitmap, asset, resource, external file or any other URI.
@@ -19,6 +21,7 @@ public final class ImageSource {
     private final Uri uri;
     private final Bitmap bitmap;
     private final Integer resource;
+    private final InputProvider provider;
     private boolean tile;
     private int sWidth;
     private int sHeight;
@@ -29,6 +32,7 @@ public final class ImageSource {
         this.bitmap = bitmap;
         this.uri = null;
         this.resource = null;
+        this.provider = null;
         this.tile = false;
         this.sWidth = bitmap.getWidth();
         this.sHeight = bitmap.getHeight();
@@ -39,6 +43,15 @@ public final class ImageSource {
         this.bitmap = null;
         this.uri = uri;
         this.resource = null;
+        this.provider = null;
+        this.tile = true;
+    }
+
+    private ImageSource(InputProvider provider) {
+        this.bitmap = null;
+        this.uri = null;
+        this.resource = null;
+        this.provider = provider;
         this.tile = true;
     }
 
@@ -46,6 +59,7 @@ public final class ImageSource {
         this.bitmap = null;
         this.uri = null;
         this.resource = resource;
+        this.provider = null;
         this.tile = true;
     }
 
@@ -95,6 +109,13 @@ public final class ImageSource {
             throw new NullPointerException("Uri must not be null");
         }
         return new ImageSource(uri);
+    }
+
+    public static ImageSource provider(InputProvider provider) {
+        if (provider == null) {
+            throw new NullPointerException("InputProvider must not be null");
+        }
+        return new ImageSource(provider);
     }
 
     /**
@@ -185,6 +206,10 @@ public final class ImageSource {
 
     protected final Uri getUri() {
         return uri;
+    }
+
+    protected final InputProvider getProvider() {
+        return provider;
     }
 
     protected final Bitmap getBitmap() {

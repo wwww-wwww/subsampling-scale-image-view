@@ -4,7 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.net.Uri;
+
+import com.davemorrissey.labs.subscaleview.provider.InputProvider;
 
 /**
  * Interface for image decoding classes, allowing the default {@link android.graphics.BitmapRegionDecoder}
@@ -19,11 +20,11 @@ public interface ImageRegionDecoder {
      * Asset: file:///android_asset/picture.png
      * Resource: android.resource://com.example.app/drawable/picture
      * @param context Application context. A reference may be held, but must be cleared on recycle.
-     * @param uri URI of the image.
+     * @param provider Provider of the image.
      * @return Dimensions of the image.
      * @throws Exception if initialisation fails.
      */
-    Point init(Context context, Uri uri) throws Exception;
+    Point init(Context context, InputProvider provider) throws Exception;
 
     /**
      * Decode a region of the image with the given sample size. This method is called off the UI thread so it can safely
