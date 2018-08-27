@@ -1589,6 +1589,7 @@ public class SubsamplingScaleImageView extends View {
         this.sWidth = sWidth;
         this.sHeight = sHeight;
         this.sOrientation = sOrientation;
+        if (provider == null) return; // The image can be recycled before this task finished
         checkReady();
         if (!checkImageLoaded() && maxTileWidth > 0 && maxTileWidth != TILE_SIZE_AUTO && maxTileHeight > 0 && maxTileHeight != TILE_SIZE_AUTO && getWidth() > 0 && getHeight() > 0) {
             initialiseBaseLayer(new Point(maxTileWidth, maxTileHeight));
