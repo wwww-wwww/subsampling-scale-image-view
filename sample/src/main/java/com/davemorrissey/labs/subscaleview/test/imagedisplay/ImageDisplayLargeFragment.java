@@ -24,7 +24,7 @@ public class ImageDisplayLargeFragment extends Fragment {
             });
         }
         SubsamplingScaleImageView imageView = rootView.findViewById(id.imageView);
-        imageView.setImage(ImageSource.asset("card.png"));
+        imageView.setImage(ImageSource.asset(getContext(), "card.png"));
         return rootView;
     }
 

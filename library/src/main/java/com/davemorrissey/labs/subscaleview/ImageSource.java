@@ -1,13 +1,18 @@
 package com.davemorrissey.labs.subscaleview;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
+import com.davemorrissey.labs.subscaleview.provider.AssetInputProvider;
+import com.davemorrissey.labs.subscaleview.provider.InputProvider;
+import com.davemorrissey.labs.subscaleview.provider.OpenStreamProvider;
+import com.davemorrissey.labs.subscaleview.provider.ResourceInputProvider;
+import com.davemorrissey.labs.subscaleview.provider.UriInputProvider;
+
+import java.io.InputStream;
 
 /**
  * Helper class used to set the source and additional attributes from a variety of sources. Supports
@@ -19,13 +24,8 @@ import java.net.URLDecoder;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public final class ImageSource {
 
-    static final String FILE_SCHEME = "file:///";
-    static final String ASSET_SCHEME = "file:///android_asset/";
-
-    private final Uri uri;
     private final Bitmap bitmap;
-    private final Integer resource;
-    private boolean tile;
+    private final InputProvider provider;
     private int sWidth;
     private int sHeight;
     private Rect sRegion;
@@ -33,38 +33,15 @@ public final class ImageSource {
 
     private ImageSource(Bitmap bitmap, boolean cached) {
         this.bitmap = bitmap;
-        this.uri = null;
-        this.resource = null;
-        this.tile = false;
+        this.provider = null;
         this.sWidth = bitmap.getWidth();
         this.sHeight = bitmap.getHeight();
         this.cached = cached;
     }
 
-    private ImageSource(@NonNull Uri uri) {
-        // #114 If file doesn't exist, attempt to url decode the URI and try again
-        String uriString = uri.toString();
-        if (uriString.startsWith(FILE_SCHEME)) {
-            File uriFile = new File(uriString.substring(FILE_SCHEME.length() - 1));
-            if (!uriFile.exists()) {
-                try {
-                    uri = Uri.parse(URLDecoder.decode(uriString, "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    // Fallback to encoded URI. This exception is not expected.
-                }
-            }
-        }
+    private ImageSource(InputProvider provider) {
         this.bitmap = null;
-        this.uri = uri;
-        this.resource = null;
-        this.tile = true;
-    }
-
-    private ImageSource(int resource) {
-        this.bitmap = null;
-        this.uri = null;
-        this.resource = resource;
-        this.tile = true;
+        this.provider = provider;
     }
 
     /**
@@ -73,8 +50,8 @@ public final class ImageSource {
      * @return an {@link ImageSource} instance.
      */
     @NonNull
-    public static ImageSource resource(int resId) {
-        return new ImageSource(resId);
+    public static ImageSource resource(Context context, int resId) {
+        return new ImageSource(new ResourceInputProvider(context, resId));
     }
 
     /**
@@ -83,33 +60,12 @@ public final class ImageSource {
      * @return an {@link ImageSource} instance.
      */
     @NonNull
-    public static ImageSource asset(@NonNull String assetName) {
+    public static ImageSource asset(Context context, @NonNull String assetName) {
         //noinspection ConstantConditions
         if (assetName == null) {
             throw new NullPointerException("Asset name must not be null");
         }
-        return uri(ASSET_SCHEME + assetName);
-    }
-
-    /**
-     * Create an instance from a URI. If the URI does not start with a scheme, it's assumed to be the URI
-     * of a file.
-     * @param uri image URI.
-     * @return an {@link ImageSource} instance.
-     */
-    @NonNull
-    public static ImageSource uri(@NonNull String uri) {
-        //noinspection ConstantConditions
-        if (uri == null) {
-            throw new NullPointerException("Uri must not be null");
-        }
-        if (!uri.contains("://")) {
-            if (uri.startsWith("/")) {
-                uri = uri.substring(1);
-            }
-            uri = FILE_SCHEME + uri;
-        }
-        return new ImageSource(Uri.parse(uri));
+        return new ImageSource(new AssetInputProvider(context, assetName));
     }
 
     /**
@@ -118,12 +74,40 @@ public final class ImageSource {
      * @return an {@link ImageSource} instance.
      */
     @NonNull
-    public static ImageSource uri(@NonNull Uri uri) {
+    public static ImageSource uri(Context context, @NonNull Uri uri) {
         //noinspection ConstantConditions
         if (uri == null) {
             throw new NullPointerException("Uri must not be null");
         }
-        return new ImageSource(uri);
+        return new ImageSource(new UriInputProvider(context, uri));
+    }
+
+    /**
+     * Create an instance from an input provider.
+     * @param provider input stream provider.
+     * @return an {@link ImageSource} instance.
+     */
+    @NonNull
+    public static ImageSource provider(@NonNull InputProvider provider) {
+        //noinspection ConstantConditions
+        if (provider == null) {
+            throw new NullPointerException("Input provider must not be null");
+        }
+        return new ImageSource(provider);
+    }
+
+    /**
+     * Create an instance from an input stream.
+     * @param stream open input stream.
+     * @return an {@link ImageSource} instance.
+     */
+    @NonNull
+    public static ImageSource inputStream(@NonNull InputStream stream) {
+        //noinspection ConstantConditions
+        if (stream == null) {
+            throw new NullPointerException("Input stream must not be null");
+        }
+        return new ImageSource(new OpenStreamProvider(stream));
     }
 
     /**
@@ -154,38 +138,6 @@ public final class ImageSource {
             throw new NullPointerException("Bitmap must not be null");
         }
         return new ImageSource(bitmap, true);
-    }
-
-    /**
-     * Enable tiling of the image. This does not apply to preview images which are always loaded as a single bitmap.,
-     * and tiling cannot be disabled when displaying a region of the source image.
-     * @return this instance for chaining.
-     */
-    @NonNull
-    public ImageSource tilingEnabled() {
-        return tiling(true);
-    }
-
-    /**
-     * Disable tiling of the image. This does not apply to preview images which are always loaded as a single bitmap,
-     * and tiling cannot be disabled when displaying a region of the source image.
-     * @return this instance for chaining.
-     */
-    @NonNull
-    public ImageSource tilingDisabled() {
-        return tiling(false);
-    }
-
-    /**
-     * Enable or disable tiling of the image. This does not apply to preview images which are always loaded as a single bitmap,
-     * and tiling cannot be disabled when displaying a region of the source image.
-     * @param tile whether tiling should be enabled.
-     * @return this instance for chaining.
-     */
-    @NonNull
-    public ImageSource tiling(boolean tile) {
-        this.tile = tile;
-        return this;
     }
 
     /**
@@ -221,26 +173,17 @@ public final class ImageSource {
 
     private void setInvariants() {
         if (this.sRegion != null) {
-            this.tile = true;
             this.sWidth = this.sRegion.width();
             this.sHeight = this.sRegion.height();
         }
     }
 
-    protected final Uri getUri() {
-        return uri;
+    protected final InputProvider getProvider() {
+        return provider;
     }
 
     protected final Bitmap getBitmap() {
         return bitmap;
-    }
-
-    protected final Integer getResource() {
-        return resource;
-    }
-
-    protected final boolean getTile() {
-        return tile;
     }
 
     protected final int getSWidth() {
