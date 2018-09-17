@@ -20,7 +20,7 @@ dependencies {
     javadocs 'com.android.support:support-annotations:27.1.0'
     javadocs 'com.android.support:exifinterface:27.1.0'
     implementation 'com.android.support:support-annotations:27.1.0'
-    implementation 'com.github.inorichi.image:singlelib:baac9ac'
+    implementation 'com.github.inorichi.image:singlelib:18534f9'
     implementation 'com.github.inorichi:tachimage:68cd311'
 }
 
