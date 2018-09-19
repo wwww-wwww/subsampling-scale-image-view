@@ -1411,14 +1411,14 @@ public class SubsamplingScaleImageView extends View {
     private static class TilesInitTask extends AsyncTask<Void, Void, int[]> {
         private final WeakReference<SubsamplingScaleImageView> viewRef;
         private final WeakReference<Context> contextRef;
-        private final InputProvider provider;
+        private final WeakReference<InputProvider> providerRef;
         private Decoder decoder;
         private Exception exception;
 
         TilesInitTask(SubsamplingScaleImageView view, Context context, InputProvider provider) {
             this.viewRef = new WeakReference<>(view);
             this.contextRef = new WeakReference<>(context);
-            this.provider = provider;
+            this.providerRef = new WeakReference<>(provider);
         }
 
         @Override
@@ -1426,7 +1426,8 @@ public class SubsamplingScaleImageView extends View {
             try {
                 Context context = contextRef.get();
                 SubsamplingScaleImageView view = viewRef.get();
-                if (context != null && view != null) {
+                InputProvider provider = providerRef.get();
+                if (context != null && view != null && provider == view.provider) {
                     view.debug("TilesInitTask.doInBackground");
                     decoder = new ImageDecoder();
                     Point dimensions = decoder.init(context, provider);
@@ -1452,7 +1453,8 @@ public class SubsamplingScaleImageView extends View {
         @Override
         protected void onPostExecute(int[] xy) {
             final SubsamplingScaleImageView view = viewRef.get();
-            if (view != null) {
+            final InputProvider provider = providerRef.get();
+            if (view != null && provider == view.provider) {
                 if (decoder != null && xy != null && xy.length == 2) {
                     view.onTilesInited(decoder, xy[0], xy[1]);
                 } else if (exception != null && view.onImageEventListener != null) {
@@ -1493,13 +1495,13 @@ public class SubsamplingScaleImageView extends View {
     private static class TilesCropInitTask extends AsyncTask<Void, Void, Bitmap> {
         private final WeakReference<SubsamplingScaleImageView> viewRef;
         private final WeakReference<Decoder> decoderRef;
-        private final Tile tile;
+        private final WeakReference<Tile> tileRef;
         private Exception exception;
 
         TilesCropInitTask(SubsamplingScaleImageView view, Decoder decoder, Tile tile) {
             this.viewRef = new WeakReference<>(view);
             this.decoderRef = new WeakReference<>(decoder);
-            this.tile = tile;
+            this.tileRef = new WeakReference<>(tile);
             tile.loading = true;
         }
 
@@ -1508,7 +1510,8 @@ public class SubsamplingScaleImageView extends View {
             try {
                 SubsamplingScaleImageView view = viewRef.get();
                 Decoder decoder = decoderRef.get();
-                if (decoder != null && view != null && decoder.isReady()) {
+                Tile tile = tileRef.get();
+                if (decoder != null && view != null && tile != null && decoder.isReady()) {
                     view.debug("TilesCropInitTask.doInBackground, tile.sRect=%s, tile.sampleSize=%d", tile.sRect, tile.sampleSize);
                     view.decoderLock.readLock().lock();
                     try {
@@ -1530,7 +1533,7 @@ public class SubsamplingScaleImageView extends View {
                     } finally {
                         view.decoderLock.readLock().unlock();
                     }
-                } else {
+                } else if (tile != null) {
                     tile.loading = false;
                 }
             } catch (Exception e) {
@@ -1553,7 +1556,8 @@ public class SubsamplingScaleImageView extends View {
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             final SubsamplingScaleImageView view = viewRef.get();
-            if (view != null) {
+            final Tile tile = tileRef.get();
+            if (view != null && tile != null) {
                 view.tilesCropInitTask = null; // Task completed, unset this
                 if (bitmap != null && view.fullImageSampleSize != 0) {
                     view.sWidth = tile.fileSRect.width();
@@ -1564,8 +1568,8 @@ public class SubsamplingScaleImageView extends View {
                     view.initialiseTileMap(new Point(view.maxTileWidth, view.maxTileHeight));
 
                     for (List<Tile> tiles : view.tileMap.values()) {
-                        for (Tile tile : tiles) {
-                            tile.fileSRect.offset(offsetX, offsetY);
+                        for (Tile childTile : tiles) {
+                            childTile.fileSRect.offset(offsetX, offsetY);
                         }
                     }
 
