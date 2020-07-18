@@ -8,11 +8,12 @@ import android.graphics.Paint.Cap;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.PointF;
-import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+
+import androidx.annotation.NonNull;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 

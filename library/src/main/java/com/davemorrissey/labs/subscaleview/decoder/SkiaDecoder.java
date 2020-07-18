@@ -6,10 +6,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.os.Build;
-import android.support.annotation.Keep;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.davemorrissey.labs.subscaleview.provider.InputProvider;
@@ -114,16 +114,7 @@ public class SkiaDecoder implements Decoder {
         }
     }
 
-    /**
-     * Before SDK 21, BitmapRegionDecoder was not synchronized internally. Any attempt to decode
-     * regions from multiple threads with one decoder instance causes a segfault. For old versions
-     * use the write lock to enforce single threaded decoding.
-     */
     private Lock getDecodeLock() {
-        if (Build.VERSION.SDK_INT < 21) {
-            return decoderLock.writeLock();
-        } else {
-            return decoderLock.readLock();
-        }
+        return decoderLock.readLock();
     }
 }

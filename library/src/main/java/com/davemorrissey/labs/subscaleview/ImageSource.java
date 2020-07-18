@@ -4,7 +4,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import com.davemorrissey.labs.subscaleview.provider.AssetInputProvider;
 import com.davemorrissey.labs.subscaleview.provider.InputProvider;
