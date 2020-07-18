@@ -1,8 +1,13 @@
 package com.davemorrissey.labs.subscaleview.test.extension.views;
 
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PointF;
 import android.util.AttributeSet;
+
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.davemorrissey.labs.subscaleview.test.R.drawable;
 
@@ -32,9 +37,9 @@ public class PinView extends SubsamplingScaleImageView {
     private void initialise() {
         float density = getResources().getDisplayMetrics().densityDpi;
         pin = BitmapFactory.decodeResource(this.getResources(), drawable.pushpin_blue);
-        float w = (density/420f) * pin.getWidth();
-        float h = (density/420f) * pin.getHeight();
-        pin = Bitmap.createScaledBitmap(pin, (int)w, (int)h, true);
+        float w = (density / 420f) * pin.getWidth();
+        float h = (density / 420f) * pin.getHeight();
+        pin = Bitmap.createScaledBitmap(pin, (int) w, (int) h, true);
     }
 
     @Override
@@ -50,7 +55,7 @@ public class PinView extends SubsamplingScaleImageView {
 
         if (sPin != null && pin != null) {
             sourceToViewCoord(sPin, vPin);
-            float vX = vPin.x - (pin.getWidth()/2);
+            float vX = vPin.x - (pin.getWidth() / 2);
             float vY = vPin.y - pin.getHeight();
             canvas.drawBitmap(pin, vX, vY, paint);
         }

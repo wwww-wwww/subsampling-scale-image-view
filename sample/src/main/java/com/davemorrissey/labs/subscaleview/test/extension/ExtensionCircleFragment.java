@@ -17,13 +17,19 @@ public class ExtensionCircleFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(layout.extension_circle_fragment, container, false);
-        final ExtensionActivity activity = (ExtensionActivity)getActivity();
+        final ExtensionActivity activity = (ExtensionActivity) getActivity();
         if (activity != null) {
             rootView.findViewById(id.next).setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) { activity.next(); }
+                @Override
+                public void onClick(View v) {
+                    activity.next();
+                }
             });
             rootView.findViewById(id.previous).setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) { activity.previous(); }
+                @Override
+                public void onClick(View v) {
+                    activity.previous();
+                }
             });
         }
         SubsamplingScaleImageView imageView = rootView.findViewById(id.imageView);

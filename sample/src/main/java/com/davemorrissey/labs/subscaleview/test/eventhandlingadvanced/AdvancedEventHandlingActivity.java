@@ -15,8 +15,18 @@ import com.davemorrissey.labs.subscaleview.test.R.id;
 
 import java.util.Arrays;
 
-import static com.davemorrissey.labs.subscaleview.test.R.string.*;
-import static com.davemorrissey.labs.subscaleview.test.R.layout.*;
+import static com.davemorrissey.labs.subscaleview.test.R.layout.pages_activity;
+import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p1_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p1_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p2_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p2_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p3_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p3_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p4_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p4_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p5_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p5_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_title;
 
 public class AdvancedEventHandlingActivity extends AbstractPagesActivity {
 
@@ -39,26 +49,28 @@ public class AdvancedEventHandlingActivity extends AbstractPagesActivity {
             public boolean onSingleTapConfirmed(MotionEvent e) {
                 if (imageView.isReady()) {
                     PointF sCoord = imageView.viewToSourceCoord(e.getX(), e.getY());
-                    Toast.makeText(getApplicationContext(), "Single tap: " + ((int)sCoord.x) + ", " + ((int)sCoord.y), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Single tap: " + ((int) sCoord.x) + ", " + ((int) sCoord.y), Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Single tap: Image not ready", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
+
             @Override
             public void onLongPress(MotionEvent e) {
                 if (imageView.isReady()) {
                     PointF sCoord = imageView.viewToSourceCoord(e.getX(), e.getY());
-                    Toast.makeText(getApplicationContext(), "Long press: " + ((int)sCoord.x) + ", " + ((int)sCoord.y), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Long press: " + ((int) sCoord.x) + ", " + ((int) sCoord.y), Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Long press: Image not ready", Toast.LENGTH_SHORT).show();
                 }
             }
+
             @Override
             public boolean onDoubleTap(MotionEvent e) {
                 if (imageView.isReady()) {
                     PointF sCoord = imageView.viewToSourceCoord(e.getX(), e.getY());
-                    Toast.makeText(getApplicationContext(), "Double tap: " + ((int)sCoord.x) + ", " + ((int)sCoord.y), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Double tap: " + ((int) sCoord.x) + ", " + ((int) sCoord.y), Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Double tap: Image not ready", Toast.LENGTH_SHORT).show();
                 }

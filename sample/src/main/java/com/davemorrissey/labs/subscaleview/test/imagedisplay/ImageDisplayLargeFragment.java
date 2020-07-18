@@ -17,10 +17,13 @@ public class ImageDisplayLargeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(layout.imagedisplay_large_fragment, container, false);
-        final ImageDisplayActivity activity = (ImageDisplayActivity)getActivity();
+        final ImageDisplayActivity activity = (ImageDisplayActivity) getActivity();
         if (activity != null) {
             rootView.findViewById(id.next).setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) { activity.next(); }
+                @Override
+                public void onClick(View v) {
+                    activity.next();
+                }
             });
         }
         SubsamplingScaleImageView imageView = rootView.findViewById(id.imageView);

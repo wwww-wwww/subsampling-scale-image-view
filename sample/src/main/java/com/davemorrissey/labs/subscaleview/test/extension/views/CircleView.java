@@ -1,19 +1,22 @@
 package com.davemorrissey.labs.subscaleview.test.extension.views;
 
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Paint.Cap;
 import android.graphics.Paint.Style;
+import android.graphics.PointF;
 import android.util.AttributeSet;
+
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 public class CircleView extends SubsamplingScaleImageView {
 
-    private int strokeWidth;
-
     private final PointF sCenter = new PointF();
     private final PointF vCenter = new PointF();
     private final Paint paint = new Paint();
+    private int strokeWidth;
 
     public CircleView(Context context) {
         this(context, null);
@@ -26,7 +29,7 @@ public class CircleView extends SubsamplingScaleImageView {
 
     private void initialise() {
         float density = getResources().getDisplayMetrics().densityDpi;
-        strokeWidth = (int)(density/60f);
+        strokeWidth = (int) (density / 60f);
     }
 
     @Override
@@ -38,7 +41,7 @@ public class CircleView extends SubsamplingScaleImageView {
             return;
         }
 
-        sCenter.set(getSWidth()/2, getSHeight()/2);
+        sCenter.set(getSWidth() / 2, getSHeight() / 2);
         sourceToViewCoord(sCenter, vCenter);
         float radius = (getScale() * getSWidth()) * 0.25f;
 

@@ -17,16 +17,22 @@ public class ExtensionFreehandFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(layout.extension_freehand_fragment, container, false);
-        final ExtensionActivity activity = (ExtensionActivity)getActivity();
+        final ExtensionActivity activity = (ExtensionActivity) getActivity();
         if (activity != null) {
             rootView.findViewById(id.previous).setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) { activity.previous(); }
+                @Override
+                public void onClick(View v) {
+                    activity.previous();
+                }
             });
         }
         final FreehandView imageView = rootView.findViewById(id.imageView);
         imageView.setImage(ImageSource.asset(getContext(), "sanmartino.jpg"));
         rootView.findViewById(id.reset).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { imageView.reset(); }
+            @Override
+            public void onClick(View v) {
+                imageView.reset();
+            }
         });
         return rootView;
     }

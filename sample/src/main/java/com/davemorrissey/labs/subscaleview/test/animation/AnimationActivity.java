@@ -15,9 +15,20 @@ import com.davemorrissey.labs.subscaleview.test.extension.views.PinView;
 import java.util.Arrays;
 import java.util.Random;
 
-import static com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.*;
-import static com.davemorrissey.labs.subscaleview.test.R.string.*;
-import static com.davemorrissey.labs.subscaleview.test.R.layout.*;
+import static com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.EASE_OUT_QUAD;
+import static com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.OnClickListener;
+import static com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.PAN_LIMIT_CENTER;
+import static com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.PAN_LIMIT_INSIDE;
+import static com.davemorrissey.labs.subscaleview.test.R.layout.animation_activity;
+import static com.davemorrissey.labs.subscaleview.test.R.string.animation_p1_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.animation_p1_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.animation_p2_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.animation_p2_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.animation_p3_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.animation_p3_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.animation_p4_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.animation_p4_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.animation_title;
 
 public class AnimationActivity extends AbstractPagesActivity {
 
@@ -36,7 +47,10 @@ public class AnimationActivity extends AbstractPagesActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         findViewById(id.play).setOnClickListener(new OnClickListener() {
-            @Override public void onClick(View v) { AnimationActivity.this.play(); }
+            @Override
+            public void onClick(View v) {
+                AnimationActivity.this.play();
+            }
         });
         view = findViewById(id.imageView);
         view.setImage(ImageSource.asset(this, "sanmartino.jpg"));

@@ -19,13 +19,19 @@ public class ImageDisplayRotateFragment extends Fragment {
         View rootView = inflater.inflate(layout.imagedisplay_rotate_fragment, container, false);
         final SubsamplingScaleImageView imageView = rootView.findViewById(id.imageView);
         imageView.setImage(ImageSource.asset(getContext(), "swissroad.jpg"));
-        final ImageDisplayActivity activity = (ImageDisplayActivity)getActivity();
+        final ImageDisplayActivity activity = (ImageDisplayActivity) getActivity();
         if (activity != null) {
             rootView.findViewById(id.previous).setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) { activity.previous(); }
+                @Override
+                public void onClick(View v) {
+                    activity.previous();
+                }
             });
             rootView.findViewById(id.next).setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) { activity.next(); }
+                @Override
+                public void onClick(View v) {
+                    activity.next();
+                }
             });
         }
         return rootView;

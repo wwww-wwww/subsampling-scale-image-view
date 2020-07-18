@@ -17,7 +17,7 @@ public interface Decoder {
      * Initialise the decoder. When possible, perform initial setup work once in this method. The
      * dimensions of the image must be returned.
      *
-     * @param context Application context. A reference may be held, but must be cleared on recycle.
+     * @param context  Application context. A reference may be held, but must be cleared on recycle.
      * @param provider Provider of the image.
      * @return Dimensions of the image.
      * @throws Exception if initialisation fails.
@@ -33,7 +33,7 @@ public interface Decoder {
      * is the simplest way to achieve this, but bear in mind the {@link #recycle()} method can be
      * called concurrently.
      *
-     * @param sRect Source image rectangle to decode.
+     * @param sRect      Source image rectangle to decode.
      * @param sampleSize Sample size.
      * @return The decoded region. It is safe to return null if decoding fails.
      */
@@ -42,6 +42,7 @@ public interface Decoder {
 
     /**
      * Status check. Should return false before initialisation and after recycle.
+     *
      * @return true if the decoder is ready to be used.
      */
     boolean isReady();

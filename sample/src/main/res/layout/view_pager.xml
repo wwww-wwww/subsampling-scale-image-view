@@ -1,20 +1,36 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" style="@style/fill">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/fill">
 
-    <RelativeLayout style="@style/footer" android:id="@+id/footer">
+    <RelativeLayout
+        android:id="@+id/footer"
+        style="@style/footer">
 
-        <ImageView style="@style/previousButton" android:id="@+id/previous" android:contentDescription="@string/button.previous"/>
+        <ImageView
+            android:id="@+id/previous"
+            style="@style/previousButton"
+            android:contentDescription="@string/button.previous" />
 
-        <ImageView style="@style/nextButton" android:id="@+id/next" android:contentDescription="@string/button.next"/>
+        <ImageView
+            android:id="@+id/next"
+            style="@style/nextButton"
+            android:contentDescription="@string/button.next" />
 
-        <TextView style="@style/footerNote"
-                android:id="@+id/note"
-                android:layout_toStartOf="@id/next"
-                android:layout_toEndOf="@id/previous"/>
+        <TextView
+            android:id="@+id/note"
+            style="@style/footerNote"
+            android:layout_toStartOf="@id/next"
+            android:layout_toEndOf="@id/previous" />
 
     </RelativeLayout>
 
-    <android.support.v4.view.ViewPager style="@style/mainPanel" android:id="@+id/horizontal_pager" android:visibility="gone" />
+    <android.support.v4.view.ViewPager
+        android:id="@+id/horizontal_pager"
+        style="@style/mainPanel"
+        android:visibility="gone" />
 
-    <com.davemorrissey.labs.subscaleview.test.viewpager.VerticalViewPager style="@style/mainPanel" android:id="@+id/vertical_pager" android:visibility="gone"/>
+    <com.davemorrissey.labs.subscaleview.test.viewpager.VerticalViewPager
+        android:id="@+id/vertical_pager"
+        style="@style/mainPanel"
+        android:visibility="gone" />
 
 </RelativeLayout>

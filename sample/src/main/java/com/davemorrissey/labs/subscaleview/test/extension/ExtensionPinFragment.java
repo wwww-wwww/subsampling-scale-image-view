@@ -18,10 +18,13 @@ public class ExtensionPinFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(layout.extension_pin_fragment, container, false);
-        final ExtensionActivity activity = (ExtensionActivity)getActivity();
+        final ExtensionActivity activity = (ExtensionActivity) getActivity();
         if (activity != null) {
             rootView.findViewById(id.next).setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) { activity.next(); }
+                @Override
+                public void onClick(View v) {
+                    activity.next();
+                }
             });
         }
         PinView imageView = rootView.findViewById(id.imageView);

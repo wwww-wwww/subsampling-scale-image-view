@@ -52,7 +52,10 @@ public class ImageDecoder implements Decoder {
             decoder = BitmapRegionDecoder.newInstance(inputStream);
         } finally {
             if (inputStream != null) {
-                try { inputStream.close(); } catch (Exception e) { }
+                try {
+                    inputStream.close();
+                } catch (Exception e) {
+                }
             }
         }
         if (decoder == null) {
@@ -69,13 +72,13 @@ public class ImageDecoder implements Decoder {
      * is the simplest way to achieve this, but bear in mind the {@link #recycle()} method can be
      * called concurrently.
      *
-     * @param sRect Source image rectangle to decode.
+     * @param sRect      Source image rectangle to decode.
      * @param sampleSize Sample size.
      * @return The decoded region. It is safe to return null if decoding fails.
      */
     @NonNull
     public Bitmap decodeRegion(@NonNull Rect sRect, int sampleSize) {
-        int ratio = 1 + (int)(Math.log(sampleSize) / Math.log(2));
+        int ratio = 1 + (int) (Math.log(sampleSize) / Math.log(2));
         int config = getImageConfig();
 
         Bitmap bitmap = decoder.decodeRegion(sRect, config, ratio);
@@ -89,6 +92,7 @@ public class ImageDecoder implements Decoder {
 
     /**
      * Status check. Should return false before initialisation and after recycle.
+     *
      * @return true if the decoder is ready to be used.
      */
     public boolean isReady() {

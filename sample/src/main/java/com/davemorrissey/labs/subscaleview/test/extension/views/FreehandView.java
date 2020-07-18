@@ -1,14 +1,19 @@
 package com.davemorrissey.labs.subscaleview.test.extension.views;
 
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Paint.Cap;
 import android.graphics.Paint.Style;
+import android.graphics.Path;
+import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 
 import java.util.ArrayList;
@@ -40,7 +45,7 @@ public class FreehandView extends SubsamplingScaleImageView implements OnTouchLi
     private void initialise() {
         setOnTouchListener(this);
         float density = getResources().getDisplayMetrics().densityDpi;
-        strokeWidth = (int)(density/60f);
+        strokeWidth = (int) (density / 60f);
     }
 
     @Override

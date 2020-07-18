@@ -27,7 +27,7 @@ public class ExtensionActivity extends AbstractFragmentsActivity {
             ExtensionCircleFragment.class,
             ExtensionFreehandFragment.class
     );
-    
+
     public ExtensionActivity() {
         super(extension_title, fragments_activity, Arrays.asList(
                 new Page(extension_p1_subtitle, extension_p1_text),

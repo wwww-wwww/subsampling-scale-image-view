@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 /**
  * Provider from an already open input stream.
- *
+ * <p>
  * Please keep in mind this provider is not reusable.
  */
 public class OpenStreamProvider implements InputProvider {

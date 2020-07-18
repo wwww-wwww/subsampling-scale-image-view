@@ -13,12 +13,10 @@ import java.util.List;
 public abstract class AbstractPagesActivity extends FragmentActivity {
 
     private static final String BUNDLE_PAGE = "page";
-
-    private int page;
-
     private final int title;
     private final int layout;
     private final List<Page> notes;
+    private int page;
 
     protected AbstractPagesActivity(int title, int layout, List<Page> notes) {
         this.title = title;
@@ -36,10 +34,16 @@ public abstract class AbstractPagesActivity extends FragmentActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { next(); }
+            @Override
+            public void onClick(View v) {
+                next();
+            }
         });
         findViewById(R.id.previous).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { previous(); }
+            @Override
+            public void onClick(View v) {
+                previous();
+            }
         });
         if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_PAGE)) {
             page = savedInstanceState.getInt(BUNDLE_PAGE);
@@ -82,7 +86,7 @@ public abstract class AbstractPagesActivity extends FragmentActivity {
         if (actionBar != null) {
             actionBar.setSubtitle(notes.get(page).getSubtitle());
         }
-        ((TextView)findViewById(R.id.note)).setText(notes.get(page).getText());
+        ((TextView) findViewById(R.id.note)).setText(notes.get(page).getText());
         findViewById(R.id.next).setVisibility(page >= notes.size() - 1 ? View.INVISIBLE : View.VISIBLE);
         findViewById(R.id.previous).setVisibility(page <= 0 ? View.INVISIBLE : View.VISIBLE);
         onPageChanged(page);

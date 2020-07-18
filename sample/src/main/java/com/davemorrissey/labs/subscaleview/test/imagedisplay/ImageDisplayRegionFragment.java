@@ -20,10 +20,13 @@ public class ImageDisplayRegionFragment extends Fragment {
         View rootView = inflater.inflate(layout.imagedisplay_region_fragment, container, false);
         final SubsamplingScaleImageView imageView = rootView.findViewById(id.imageView);
         imageView.setImage(ImageSource.asset(getContext(), "card.png").region(new Rect(5200, 651, 8200, 3250)));
-        final ImageDisplayActivity activity = (ImageDisplayActivity)getActivity();
+        final ImageDisplayActivity activity = (ImageDisplayActivity) getActivity();
         if (activity != null) {
             rootView.findViewById(id.previous).setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) { activity.previous(); }
+                @Override
+                public void onClick(View v) {
+                    activity.previous();
+                }
             });
         }
         return rootView;

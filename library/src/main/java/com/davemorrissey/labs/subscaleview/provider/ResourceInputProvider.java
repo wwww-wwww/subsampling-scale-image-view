@@ -7,8 +7,8 @@ import java.io.InputStream;
 
 public class ResourceInputProvider implements InputProvider {
 
-    private Resources resources;
     public final int resource;
+    private Resources resources;
 
     public ResourceInputProvider(Context context, int resource) {
         this.resources = context.getResources();

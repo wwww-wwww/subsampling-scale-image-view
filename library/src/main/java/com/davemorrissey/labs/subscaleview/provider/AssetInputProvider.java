@@ -8,8 +8,8 @@ import java.io.InputStream;
 
 public class AssetInputProvider implements InputProvider {
 
-    private AssetManager assets;
     public final String assetName;
+    private AssetManager assets;
 
     public AssetInputProvider(Context context, String assetName) {
         this.assets = context.getAssets();

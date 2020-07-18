@@ -9,8 +9,8 @@ import java.io.InputStream;
 
 public class UriInputProvider implements InputProvider {
 
-    private ContentResolver resolver;
     public final Uri uri;
+    private ContentResolver resolver;
 
     public UriInputProvider(Context context, Uri uri) {
         this.resolver = context.getContentResolver();
