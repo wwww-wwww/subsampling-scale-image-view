@@ -26,7 +26,7 @@ dependencies {
     javadocs 'androidx.exifinterface:exifinterface:1.2.0'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'com.github.inorichi.image:singlelib:18534f9'
-    implementation 'com.github.inorichi:tachimage:68cd311'
+    implementation 'com.github.tachiyomiorg:tachimage:516a889'
 }
 
 task javadoc(type: Javadoc) {
