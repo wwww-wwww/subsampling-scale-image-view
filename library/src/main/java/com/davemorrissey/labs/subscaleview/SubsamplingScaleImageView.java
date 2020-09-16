@@ -2635,12 +2635,6 @@ public class SubsamplingScaleImageView extends View {
          * @param e The exception thrown. This error is logged by the view.
          */
         void onTileLoadError(Exception e);
-
-        /**
-         * Called when a bitmap set using ImageSource.cachedBitmap is no longer being used by the View.
-         * This is useful if you wish to manage the bitmap after the preview is shown
-         */
-        void onPreviewReleased();
     }
 
     /**
