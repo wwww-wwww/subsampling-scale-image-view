@@ -44,8 +44,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import eu.kanade.tachimage.Tachimage;
-
 /**
  * <p>
  * Displays an image subsampled as necessary to avoid loading too much image data into memory. After zooming in,
@@ -149,8 +147,6 @@ public class SubsamplingScaleImageView extends View {
     private final float[] dstArray = new float[8];
     //The logical density of the display
     private final float density;
-    // Active tiles crop init task
-    TilesCropInitTask tilesCropInitTask;
     // Bitmap (preview or full image)
     private Bitmap bitmap;
     // Specifies if a cache handler is also referencing the bitmap. Do not recycle if so.
@@ -403,10 +399,6 @@ public class SubsamplingScaleImageView extends View {
         sRect = null;
         if (newImage) {
             provider = null;
-            if (tilesCropInitTask != null) {
-                tilesCropInitTask.cancel(false);
-                tilesCropInitTask = null;
-            }
             decoderLock.writeLock().lock();
             try {
                 if (decoder != null) {
@@ -881,7 +873,7 @@ public class SubsamplingScaleImageView extends View {
         }
 
         // When using tiles, on first render with no tile map ready, initialise it and kick off async base image loading.
-        if (tileMap == null && decoder != null && (!cropBorders || tilesCropInitTask == null)) {
+        if (tileMap == null && decoder != null) {
             initialiseBaseLayer(getMaxBitmapDimensions(canvas));
         }
 
@@ -1150,27 +1142,14 @@ public class SubsamplingScaleImageView extends View {
             fullImageSampleSize /= 2;
         }
 
-        if (!cropBorders) {
-            initialiseTileMap(maxTileDimensions);
+        initialiseTileMap(maxTileDimensions);
 
-            List<Tile> baseGrid = tileMap.get(fullImageSampleSize);
-            for (Tile baseTile : baseGrid) {
-                TileLoadTask task = new TileLoadTask(this, decoder, baseTile);
-                execute(task);
-            }
-            refreshRequiredTiles(true);
-        } else {
-            Tile tile = new Tile();
-            tile.sampleSize = fullImageSampleSize;
-            tile.visible = true;
-            tile.vRect = new Rect(0, 0, 0, 0);
-            tile.sRect = new Rect(0, 0, sWidth, sHeight);
-            tile.fileSRect = new Rect(tile.sRect);
-
-            TilesCropInitTask task = new TilesCropInitTask(this, decoder, tile);
+        List<Tile> baseGrid = tileMap.get(fullImageSampleSize);
+        for (Tile baseTile : baseGrid) {
+            TileLoadTask task = new TileLoadTask(this, decoder, baseTile);
             execute(task);
-            tilesCropInitTask = task;
         }
+        refreshRequiredTiles(true);
     }
 
     /**
@@ -1515,7 +1494,7 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * Set border crop of non-filled (white) content.
+     * Set border crop of non-filled (white or black) content.
      *
      * @param cropBorders Whether to crop image borders.
      */
@@ -2689,7 +2668,7 @@ public class SubsamplingScaleImageView extends View {
                 InputProvider provider = providerRef.get();
                 if (context != null && view != null && provider == view.provider) {
                     view.debug("TilesInitTask.doInBackground");
-                    decoder = new ImageDecoder();
+                    decoder = new ImageDecoder(view.cropBorders);
                     Point dimensions = decoder.init(context, provider);
                     int sWidth = dimensions.x;
                     int sHeight = dimensions.y;
@@ -2717,106 +2696,6 @@ public class SubsamplingScaleImageView extends View {
             if (view != null && provider == view.provider) {
                 if (decoder != null && xy != null && xy.length == 2) {
                     view.onTilesInited(decoder, xy[0], xy[1]);
-                } else if (exception != null && view.onImageEventListener != null) {
-                    view.onImageEventListener.onImageLoadError(exception);
-                }
-            }
-        }
-    }
-
-    private static class TilesCropInitTask extends AsyncTask<Void, Void, Bitmap> {
-        private final WeakReference<SubsamplingScaleImageView> viewRef;
-        private final WeakReference<Decoder> decoderRef;
-        private final WeakReference<Tile> tileRef;
-        private Exception exception;
-
-        TilesCropInitTask(SubsamplingScaleImageView view, Decoder decoder, Tile tile) {
-            this.viewRef = new WeakReference<>(view);
-            this.decoderRef = new WeakReference<>(decoder);
-            this.tileRef = new WeakReference<>(tile);
-            tile.loading = true;
-        }
-
-        @Override
-        protected Bitmap doInBackground(Void... params) {
-            try {
-                SubsamplingScaleImageView view = viewRef.get();
-                Decoder decoder = decoderRef.get();
-                Tile tile = tileRef.get();
-                if (decoder != null && view != null && tile != null && decoder.isReady()) {
-                    view.debug("TilesCropInitTask.doInBackground, tile.sRect=%s, tile.sampleSize=%d", tile.sRect, tile.sampleSize);
-                    view.decoderLock.readLock().lock();
-                    try {
-                        Bitmap bitmap = decoder.decodeRegion(tile.fileSRect, tile.sampleSize);
-                        // If task already cancelled return now
-                        if (isCancelled()) return bitmap;
-
-                        Rect r = Tachimage.findBorders(bitmap);
-                        if (r != null) {
-                            int s = tile.sampleSize;
-
-                            // Scale rect to full res image and apply offset.
-                            tile.fileSRect.set(r.left * s, r.top * s, r.right * s, r.bottom * s);
-
-                            // Crop the image to reuse it.
-                            Tachimage.cropBitmap(bitmap, r);
-                        }
-                        return bitmap;
-                    } finally {
-                        view.decoderLock.readLock().unlock();
-                    }
-                } else if (tile != null) {
-                    tile.loading = false;
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to decode tile", e);
-                this.exception = e;
-            } catch (OutOfMemoryError e) {
-                Log.e(TAG, "Failed to decode tile - OutOfMemoryError", e);
-                this.exception = new RuntimeException(e);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onCancelled(Bitmap bitmap) {
-            if (bitmap != null) {
-                bitmap.recycle();
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            final SubsamplingScaleImageView view = viewRef.get();
-            final Tile tile = tileRef.get();
-            if (view != null && tile != null) {
-                view.tilesCropInitTask = null; // Task completed, unset this
-                if (bitmap != null && view.fullImageSampleSize != 0) {
-                    view.sWidth = tile.fileSRect.width();
-                    view.sHeight = tile.fileSRect.height();
-                    int offsetX = tile.fileSRect.left;
-                    int offsetY = tile.fileSRect.top;
-
-                    view.initialiseTileMap(new Point(view.maxTileWidth, view.maxTileHeight));
-
-                    for (List<Tile> tiles : view.tileMap.values()) {
-                        for (Tile childTile : tiles) {
-                            childTile.fileSRect.offset(offsetX, offsetY);
-                        }
-                    }
-
-                    List<Tile> tiles = view.tileMap.get(view.fullImageSampleSize);
-                    if (tiles.size() == 1) {
-                        tiles.get(0).bitmap = bitmap;
-                    } else {
-                        bitmap.recycle();
-                    }
-                    view.refreshRequiredTiles(true);
-
-                    view.checkReady();
-                    view.checkImageLoaded();
-                    view.invalidate();
-                    view.requestLayout();
                 } else if (exception != null && view.onImageEventListener != null) {
                     view.onImageEventListener.onImageLoadError(exception);
                 }

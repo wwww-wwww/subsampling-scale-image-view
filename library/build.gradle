@@ -24,10 +24,8 @@ configurations {
 
 dependencies {
     javadocs 'androidx.annotation:annotation:1.1.0'
-    javadocs 'androidx.exifinterface:exifinterface:1.3.0'
     implementation 'androidx.annotation:annotation:1.1.0'
-    implementation 'com.github.tachiyomiorg.image:singlelib:117cdc9'
-    implementation 'com.github.tachiyomiorg:tachimage:516a889'
+    implementation 'com.github.tachiyomiorg:image-decoder:07b21d9'
 }
 
 task javadoc(type: Javadoc) {

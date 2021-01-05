@@ -9,8 +9,6 @@ import androidx.annotation.NonNull;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.davemorrissey.labs.subscaleview.provider.InputProvider;
-import com.hippo.image.BitmapDecoder;
-import com.hippo.image.BitmapRegionDecoder;
 
 import java.io.InputStream;
 
@@ -18,13 +16,16 @@ public class ImageDecoder implements Decoder {
 
     private final Bitmap.Config bitmapConfig;
 
-    private BitmapRegionDecoder decoder = null;
+    private final boolean cropBorders;
 
-    public ImageDecoder() {
-        this(null);
+    private tachiyomi.decoder.ImageDecoder decoder = null;
+
+    public ImageDecoder(boolean cropBorders) {
+        this(null, cropBorders);
     }
 
-    public ImageDecoder(Bitmap.Config bitmapConfig) {
+    public ImageDecoder(Bitmap.Config bitmapConfig, boolean cropBorders) {
+        this.cropBorders = cropBorders;
         Bitmap.Config globalBitmapConfig = SubsamplingScaleImageView.getPreferredBitmapConfig();
         if (bitmapConfig != null) {
             this.bitmapConfig = bitmapConfig;
@@ -50,7 +51,7 @@ public class ImageDecoder implements Decoder {
         InputStream inputStream = null;
         try {
             inputStream = provider.openStream();
-            decoder = BitmapRegionDecoder.newInstance(inputStream);
+            decoder = tachiyomi.decoder.ImageDecoder.Companion.newInstance(inputStream, cropBorders);
         } finally {
             if (inputStream != null) {
                 try {
@@ -79,10 +80,9 @@ public class ImageDecoder implements Decoder {
      */
     @NonNull
     public Bitmap decodeRegion(@NonNull Rect sRect, int sampleSize) {
-        int ratio = 1 + (int) (Math.log(sampleSize) / Math.log(2));
-        int config = getImageConfig();
+        boolean config = getImageConfig();
 
-        Bitmap bitmap = decoder.decodeRegion(sRect, config, ratio);
+        Bitmap bitmap = decoder.decode(sRect, config, sampleSize);
 
         if (bitmap != null) {
             return bitmap;
@@ -111,20 +111,11 @@ public class ImageDecoder implements Decoder {
     /**
      * Returns image config from subsampling view configuration.
      */
-    private int getImageConfig() {
-        int config = BitmapDecoder.CONFIG_AUTO;
-        if (bitmapConfig != null) {
-            switch (bitmapConfig) {
-                case ARGB_8888:
-                    config = BitmapDecoder.CONFIG_RGBA_8888;
-                    break;
-                case RGB_565:
-                    config = BitmapDecoder.CONFIG_RGB_565;
-                    break;
-                default:
-                    break;
-            }
+    private boolean getImageConfig() {
+        boolean rgb565 = true;
+        if (bitmapConfig != null && bitmapConfig.equals(Bitmap.Config.ARGB_8888)) {
+            rgb565 = false;
         }
-        return config;
+        return rgb565;
     }
 }
