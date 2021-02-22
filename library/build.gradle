@@ -25,7 +25,7 @@ configurations {
 dependencies {
     javadocs 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.annotation:annotation:1.1.0'
-    implementation 'com.github.tachiyomiorg:image-decoder:d51fe60'
+    implementation 'com.github.tachiyomiorg:image-decoder:75ab552'
 }
 
 task javadoc(type: Javadoc) {
