@@ -32,6 +32,7 @@ import com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder;
 import com.davemorrissey.labs.subscaleview.decoder.Decoder;
 import com.davemorrissey.labs.subscaleview.provider.InputProvider;
 
+import java.io.ByteArrayOutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -137,6 +138,10 @@ public class SubsamplingScaleImageView extends View {
     private static final int MESSAGE_LONG_CLICK = 1;
     // A global preference for bitmap format, available to decoder classes that respect it
     private static Bitmap.Config preferredBitmapConfig;
+    // Whether to enable color management
+    private static boolean colorManagement;
+    // Optional display profile for CMS
+    private static ByteArrayOutputStream displayProfile = new ByteArrayOutputStream();
     private final ReadWriteLock decoderLock = new ReentrantReadWriteLock(true);
     // Current quickscale state
     private final float quickScaleThreshold;
@@ -322,6 +327,25 @@ public class SubsamplingScaleImageView extends View {
      */
     public static void setPreferredBitmapConfig(Bitmap.Config preferredBitmapConfig) {
         SubsamplingScaleImageView.preferredBitmapConfig = preferredBitmapConfig;
+    }
+
+    /**
+     * Set to enable color management.
+     *
+     * @param colorManagement Whether to enable color management.
+     */
+    public static void setColorManagement(boolean colorManagement) {
+        SubsamplingScaleImageView.colorManagement = colorManagement;
+    }
+
+    /**
+     * Set to use a display profile for color management.
+     *
+     * @param displayProfile Profile to use.
+     */
+    public static void setDisplayProfile(byte[] displayProfile) {
+        SubsamplingScaleImageView.displayProfile.reset();
+        SubsamplingScaleImageView.displayProfile.write(displayProfile, 0, displayProfile.length);
     }
 
     /**
@@ -2672,7 +2696,7 @@ public class SubsamplingScaleImageView extends View {
                 InputProvider provider = providerRef.get();
                 if (context != null && view != null && provider == view.provider) {
                     view.debug("TilesInitTask.doInBackground");
-                    decoder = new Decoder(view.cropBorders);
+                    decoder = new Decoder(view.cropBorders, view.colorManagement, view.displayProfile.toByteArray());
                     Point dimensions = decoder.init(context, provider);
                     int sWidth = dimensions.x;
                     int sHeight = dimensions.y;

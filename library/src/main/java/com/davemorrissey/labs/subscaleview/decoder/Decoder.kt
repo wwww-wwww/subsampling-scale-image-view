@@ -13,6 +13,8 @@ import tachiyomi.decoder.ImageDecoder.Companion.newInstance
 class Decoder(
     bitmapConfig: Bitmap.Config?,
     private val cropBorders: Boolean,
+    private val colorManagement: Boolean,
+    private val displayProfile: ByteArray,
 ) : ImageRegionDecoder {
 
     private var bitmapConfig: Bitmap.Config? = null
@@ -24,7 +26,7 @@ class Decoder(
          */
         get() = bitmapConfig == null || bitmapConfig != Bitmap.Config.ARGB_8888
 
-    constructor(cropBorders: Boolean) : this(null, cropBorders)
+    constructor(cropBorders: Boolean, colorManagement: Boolean, displayProfile: ByteArray) : this(null, cropBorders, colorManagement, displayProfile)
 
     init {
         this.bitmapConfig = bitmapConfig
@@ -68,7 +70,7 @@ class Decoder(
      * @return The decoded region. It is safe to return null if decoding fails.
      */
     override fun decodeRegion(sRect: Rect, sampleSize: Int): Bitmap {
-        val bitmap = decoder?.decode(sRect, imageConfig, sampleSize, false, null)
+        val bitmap = decoder?.decode(sRect, imageConfig, sampleSize, colorManagement, displayProfile)
         return bitmap ?: error("Null region bitmap")
     }
 
