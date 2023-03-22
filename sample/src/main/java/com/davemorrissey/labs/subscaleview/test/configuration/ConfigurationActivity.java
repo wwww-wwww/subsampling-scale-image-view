@@ -1,18 +1,5 @@
 package com.davemorrissey.labs.subscaleview.test.configuration;
 
-import android.graphics.PointF;
-import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-
-import com.davemorrissey.labs.subscaleview.ImageSource;
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.davemorrissey.labs.subscaleview.test.AbstractPagesActivity;
-import com.davemorrissey.labs.subscaleview.test.Page;
-import com.davemorrissey.labs.subscaleview.test.R.id;
-
-import java.util.Arrays;
-
 import static com.davemorrissey.labs.subscaleview.test.R.layout.pages_activity;
 import static com.davemorrissey.labs.subscaleview.test.R.string.configuration_p10_subtitle;
 import static com.davemorrissey.labs.subscaleview.test.R.string.configuration_p10_text;
@@ -35,6 +22,19 @@ import static com.davemorrissey.labs.subscaleview.test.R.string.configuration_p8
 import static com.davemorrissey.labs.subscaleview.test.R.string.configuration_p9_subtitle;
 import static com.davemorrissey.labs.subscaleview.test.R.string.configuration_p9_text;
 import static com.davemorrissey.labs.subscaleview.test.R.string.configuration_title;
+
+import android.graphics.PointF;
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.davemorrissey.labs.subscaleview.test.AbstractPagesActivity;
+import com.davemorrissey.labs.subscaleview.test.Page;
+import com.davemorrissey.labs.subscaleview.test.R.id;
+
+import java.util.Arrays;
 
 public class ConfigurationActivity extends AbstractPagesActivity {
 
@@ -111,5 +111,4 @@ public class ConfigurationActivity extends AbstractPagesActivity {
             view.setZoomEnabled(true);
         }
     }
-
 }

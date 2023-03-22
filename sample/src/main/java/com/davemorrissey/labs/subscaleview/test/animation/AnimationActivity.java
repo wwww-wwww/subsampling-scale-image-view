@@ -1,23 +1,6 @@
 package com.davemorrissey.labs.subscaleview.test.animation;
 
-import android.graphics.PointF;
-import android.os.Bundle;
-import android.view.View;
-
-import androidx.annotation.Nullable;
-
-import com.davemorrissey.labs.subscaleview.ImageSource;
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.AnimationBuilder;
-import com.davemorrissey.labs.subscaleview.test.AbstractPagesActivity;
-import com.davemorrissey.labs.subscaleview.test.Page;
-import com.davemorrissey.labs.subscaleview.test.R.id;
-import com.davemorrissey.labs.subscaleview.test.extension.views.PinView;
-
-import java.util.Arrays;
-import java.util.Random;
-
 import static com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.EASE_OUT_QUAD;
-import static com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.OnClickListener;
 import static com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.PAN_LIMIT_CENTER;
 import static com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.PAN_LIMIT_INSIDE;
 import static com.davemorrissey.labs.subscaleview.test.R.layout.animation_activity;
@@ -30,6 +13,21 @@ import static com.davemorrissey.labs.subscaleview.test.R.string.animation_p3_tex
 import static com.davemorrissey.labs.subscaleview.test.R.string.animation_p4_subtitle;
 import static com.davemorrissey.labs.subscaleview.test.R.string.animation_p4_text;
 import static com.davemorrissey.labs.subscaleview.test.R.string.animation_title;
+
+import android.graphics.PointF;
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.AnimationBuilder;
+import com.davemorrissey.labs.subscaleview.test.AbstractPagesActivity;
+import com.davemorrissey.labs.subscaleview.test.Page;
+import com.davemorrissey.labs.subscaleview.test.R.id;
+import com.davemorrissey.labs.subscaleview.test.extension.views.PinView;
+
+import java.util.Arrays;
+import java.util.Random;
 
 public class AnimationActivity extends AbstractPagesActivity {
 
@@ -47,12 +45,7 @@ public class AnimationActivity extends AbstractPagesActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        findViewById(id.play).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AnimationActivity.this.play();
-            }
-        });
+        findViewById(id.play).setOnClickListener(v -> AnimationActivity.this.play());
         view = findViewById(id.imageView);
         view.setImage(ImageSource.asset(this, "sanmartino.jpg"));
     }
@@ -82,5 +75,4 @@ public class AnimationActivity extends AbstractPagesActivity {
             }
         }
     }
-
 }

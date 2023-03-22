@@ -10,7 +10,7 @@ import java.io.InputStream;
  */
 public class OpenStreamProvider implements InputProvider {
 
-    private InputStream stream;
+    private final InputStream stream;
 
     public OpenStreamProvider(InputStream stream) {
         this.stream = stream;

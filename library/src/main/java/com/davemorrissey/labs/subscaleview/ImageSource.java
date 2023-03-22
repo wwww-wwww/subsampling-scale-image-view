@@ -188,27 +188,27 @@ public final class ImageSource {
         }
     }
 
-    protected final InputProvider getProvider() {
+    InputProvider getProvider() {
         return provider;
     }
 
-    protected final Bitmap getBitmap() {
+    Bitmap getBitmap() {
         return bitmap;
     }
 
-    protected final int getSWidth() {
+    int getSWidth() {
         return sWidth;
     }
 
-    protected final int getSHeight() {
+    int getSHeight() {
         return sHeight;
     }
 
-    protected final Rect getSRegion() {
+    Rect getSRegion() {
         return sRegion;
     }
 
-    protected final boolean isCached() {
+    boolean isCached() {
         return cached;
     }
 }

@@ -143,5 +143,4 @@ public class FreehandView extends SubsamplingScaleImageView implements OnTouchLi
         this.sPoints = null;
         invalidate();
     }
-
 }

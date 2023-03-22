@@ -51,5 +51,4 @@ public class ViewPagerFragment extends Fragment {
             outState.putString(BUNDLE_ASSET, asset);
         }
     }
-
 }

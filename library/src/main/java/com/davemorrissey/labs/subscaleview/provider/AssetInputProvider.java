@@ -9,7 +9,7 @@ import java.io.InputStream;
 public class AssetInputProvider implements InputProvider {
 
     public final String assetName;
-    private AssetManager assets;
+    private final AssetManager assets;
 
     public AssetInputProvider(Context context, String assetName) {
         this.assets = context.getAssets();

@@ -55,5 +55,4 @@ public class CircleView extends SubsamplingScaleImageView {
         paint.setColor(Color.argb(255, 51, 181, 229));
         canvas.drawCircle(vCenter.x, vCenter.y, radius, paint);
     }
-
 }

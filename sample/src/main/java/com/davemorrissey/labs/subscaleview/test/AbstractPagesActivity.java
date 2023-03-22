@@ -34,18 +34,8 @@ public abstract class AbstractPagesActivity extends FragmentActivity {
             actionBar.setTitle(getString(title));
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                next();
-            }
-        });
-        findViewById(R.id.previous).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                previous();
-            }
-        });
+        findViewById(R.id.next).setOnClickListener(v -> next());
+        findViewById(R.id.previous).setOnClickListener(v -> previous());
         if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_PAGE)) {
             page = savedInstanceState.getInt(BUNDLE_PAGE);
         }
@@ -98,7 +88,5 @@ public abstract class AbstractPagesActivity extends FragmentActivity {
     }
 
     protected void onPageChanged(int page) {
-
     }
-
 }

@@ -1,5 +1,12 @@
 package com.davemorrissey.labs.subscaleview.test.viewpager;
 
+import static com.davemorrissey.labs.subscaleview.test.R.layout.view_pager;
+import static com.davemorrissey.labs.subscaleview.test.R.string.pager_p1_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.pager_p1_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.pager_p2_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.pager_p2_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.pager_title;
+
 import android.os.Bundle;
 import android.view.View;
 
@@ -13,13 +20,6 @@ import com.davemorrissey.labs.subscaleview.test.Page;
 import com.davemorrissey.labs.subscaleview.test.R;
 
 import java.util.Arrays;
-
-import static com.davemorrissey.labs.subscaleview.test.R.layout.view_pager;
-import static com.davemorrissey.labs.subscaleview.test.R.string.pager_p1_subtitle;
-import static com.davemorrissey.labs.subscaleview.test.R.string.pager_p1_text;
-import static com.davemorrissey.labs.subscaleview.test.R.string.pager_p2_subtitle;
-import static com.davemorrissey.labs.subscaleview.test.R.string.pager_p2_text;
-import static com.davemorrissey.labs.subscaleview.test.R.string.pager_title;
 
 public class ViewPagerActivity extends AbstractPagesActivity {
 
@@ -62,7 +62,7 @@ public class ViewPagerActivity extends AbstractPagesActivity {
         }
     }
 
-    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+    private static class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
         ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -79,5 +79,4 @@ public class ViewPagerActivity extends AbstractPagesActivity {
             return IMAGES.length;
         }
     }
-
 }

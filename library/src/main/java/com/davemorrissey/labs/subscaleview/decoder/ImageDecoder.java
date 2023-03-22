@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -13,6 +14,8 @@ import com.davemorrissey.labs.subscaleview.provider.InputProvider;
 import java.io.InputStream;
 
 public class ImageDecoder implements Decoder {
+
+    private static final String TAG = ImageDecoder.class.getSimpleName();
 
     private final Bitmap.Config bitmapConfig;
 
@@ -48,17 +51,10 @@ public class ImageDecoder implements Decoder {
     @NonNull
     @Override
     public Point init(Context context, @NonNull InputProvider provider) throws Exception {
-        InputStream inputStream = null;
-        try {
-            inputStream = provider.openStream();
+        try (InputStream inputStream = provider.openStream()) {
             decoder = tachiyomi.decoder.ImageDecoder.Companion.newInstance(inputStream, cropBorders);
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (Exception ignored) {
-                }
-            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to init decoder", e);
         }
         if (decoder == null) {
             throw new Exception("Image decoder failed to initialize and get image size");
@@ -112,10 +108,6 @@ public class ImageDecoder implements Decoder {
      * Returns image config from subsampling view configuration.
      */
     private boolean getImageConfig() {
-        boolean rgb565 = true;
-        if (bitmapConfig != null && bitmapConfig.equals(Bitmap.Config.ARGB_8888)) {
-            rgb565 = false;
-        }
-        return rgb565;
+        return bitmapConfig == null || !bitmapConfig.equals(Bitmap.Config.ARGB_8888);
     }
 }

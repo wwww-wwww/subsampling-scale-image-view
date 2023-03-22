@@ -10,7 +10,7 @@ import java.io.InputStream;
 public class UriInputProvider implements InputProvider {
 
     public final Uri uri;
-    private ContentResolver resolver;
+    private final ContentResolver resolver;
 
     public UriInputProvider(Context context, Uri uri) {
         this.resolver = context.getContentResolver();

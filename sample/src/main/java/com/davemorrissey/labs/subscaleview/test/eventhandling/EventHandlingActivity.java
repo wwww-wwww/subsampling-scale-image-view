@@ -1,7 +1,15 @@
 package com.davemorrissey.labs.subscaleview.test.eventhandling;
 
+import static com.davemorrissey.labs.subscaleview.test.R.layout.pages_activity;
+import static com.davemorrissey.labs.subscaleview.test.R.string.event_p1_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.event_p1_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.event_p2_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.event_p2_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.event_p3_subtitle;
+import static com.davemorrissey.labs.subscaleview.test.R.string.event_p3_text;
+import static com.davemorrissey.labs.subscaleview.test.R.string.event_title;
+
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
@@ -11,15 +19,6 @@ import com.davemorrissey.labs.subscaleview.test.Page;
 import com.davemorrissey.labs.subscaleview.test.R.id;
 
 import java.util.Arrays;
-
-import static com.davemorrissey.labs.subscaleview.test.R.layout.pages_activity;
-import static com.davemorrissey.labs.subscaleview.test.R.string.event_p1_subtitle;
-import static com.davemorrissey.labs.subscaleview.test.R.string.event_p1_text;
-import static com.davemorrissey.labs.subscaleview.test.R.string.event_p2_subtitle;
-import static com.davemorrissey.labs.subscaleview.test.R.string.event_p2_text;
-import static com.davemorrissey.labs.subscaleview.test.R.string.event_p3_subtitle;
-import static com.davemorrissey.labs.subscaleview.test.R.string.event_p3_text;
-import static com.davemorrissey.labs.subscaleview.test.R.string.event_title;
 
 public class EventHandlingActivity extends AbstractPagesActivity {
 
@@ -36,19 +35,10 @@ public class EventHandlingActivity extends AbstractPagesActivity {
         super.onCreate(savedInstanceState);
         SubsamplingScaleImageView imageView = findViewById(id.imageView);
         imageView.setImage(ImageSource.asset(this, "sanmartino.jpg"));
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(v.getContext(), "Clicked", Toast.LENGTH_SHORT).show();
-            }
-        });
-        imageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Toast.makeText(v.getContext(), "Long clicked", Toast.LENGTH_SHORT).show();
-                return true;
-            }
+        imageView.setOnClickListener(v -> Toast.makeText(v.getContext(), "Clicked", Toast.LENGTH_SHORT).show());
+        imageView.setOnLongClickListener(v -> {
+            Toast.makeText(v.getContext(), "Long clicked", Toast.LENGTH_SHORT).show();
+            return true;
         });
     }
-
 }

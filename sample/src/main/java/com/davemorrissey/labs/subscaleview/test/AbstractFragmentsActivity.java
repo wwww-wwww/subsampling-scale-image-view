@@ -77,5 +77,4 @@ public abstract class AbstractFragmentsActivity extends FragmentActivity {
         }
         onPageChanged(page);
     }
-
 }

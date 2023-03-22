@@ -22,20 +22,9 @@ public class ImageDisplayRotateFragment extends Fragment {
         imageView.setImage(ImageSource.asset(getContext(), "swissroad.jpg"));
         final ImageDisplayActivity activity = (ImageDisplayActivity) getActivity();
         if (activity != null) {
-            rootView.findViewById(id.previous).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.previous();
-                }
-            });
-            rootView.findViewById(id.next).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.next();
-                }
-            });
+            rootView.findViewById(id.previous).setOnClickListener(v -> activity.previous());
+            rootView.findViewById(id.next).setOnClickListener(v -> activity.next());
         }
         return rootView;
     }
-
 }

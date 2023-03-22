@@ -23,14 +23,8 @@ public class ImageDisplayRegionFragment extends Fragment {
         imageView.setImage(ImageSource.asset(getContext(), "card.png").region(new Rect(5200, 651, 8200, 3250)));
         final ImageDisplayActivity activity = (ImageDisplayActivity) getActivity();
         if (activity != null) {
-            rootView.findViewById(id.previous).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.previous();
-                }
-            });
+            rootView.findViewById(id.previous).setOnClickListener(v -> activity.previous());
         }
         return rootView;
     }
-
 }

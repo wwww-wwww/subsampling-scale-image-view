@@ -1,17 +1,5 @@
 package com.davemorrissey.labs.subscaleview.test.basicfeatures;
 
-import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-
-import com.davemorrissey.labs.subscaleview.ImageSource;
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.davemorrissey.labs.subscaleview.test.AbstractPagesActivity;
-import com.davemorrissey.labs.subscaleview.test.Page;
-import com.davemorrissey.labs.subscaleview.test.R.id;
-
-import java.util.Arrays;
-
 import static com.davemorrissey.labs.subscaleview.test.R.layout.pages_activity;
 import static com.davemorrissey.labs.subscaleview.test.R.string.basic_p1_subtitle;
 import static com.davemorrissey.labs.subscaleview.test.R.string.basic_p1_text;
@@ -24,6 +12,18 @@ import static com.davemorrissey.labs.subscaleview.test.R.string.basic_p4_text;
 import static com.davemorrissey.labs.subscaleview.test.R.string.basic_p5_subtitle;
 import static com.davemorrissey.labs.subscaleview.test.R.string.basic_p5_text;
 import static com.davemorrissey.labs.subscaleview.test.R.string.basic_title;
+
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.davemorrissey.labs.subscaleview.test.AbstractPagesActivity;
+import com.davemorrissey.labs.subscaleview.test.Page;
+import com.davemorrissey.labs.subscaleview.test.R.id;
+
+import java.util.Arrays;
 
 public class BasicFeaturesActivity extends AbstractPagesActivity {
 
@@ -43,5 +43,4 @@ public class BasicFeaturesActivity extends AbstractPagesActivity {
         SubsamplingScaleImageView view = findViewById(id.imageView);
         view.setImage(ImageSource.asset(this, "sanmartino.jpg"));
     }
-
 }

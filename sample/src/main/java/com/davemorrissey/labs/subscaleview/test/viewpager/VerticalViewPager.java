@@ -49,7 +49,7 @@ public class VerticalViewPager extends ViewPager {
         return super.onTouchEvent(swapXY(ev));
     }
 
-    private class VerticalPageTransformer implements ViewPager.PageTransformer {
+    private static class VerticalPageTransformer implements ViewPager.PageTransformer {
 
         @Override
         public void transformPage(@NonNull View view, float position) {
@@ -65,5 +65,4 @@ public class VerticalViewPager extends ViewPager {
             }
         }
     }
-
 }

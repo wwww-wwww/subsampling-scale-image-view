@@ -59,7 +59,5 @@ public class PinView extends SubsamplingScaleImageView {
             float vY = vPin.y - pin.getHeight();
             canvas.drawBitmap(pin, vX, vY, paint);
         }
-
     }
-
 }

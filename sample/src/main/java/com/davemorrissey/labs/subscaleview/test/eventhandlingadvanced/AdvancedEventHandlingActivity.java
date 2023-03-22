@@ -1,20 +1,5 @@
 package com.davemorrissey.labs.subscaleview.test.eventhandlingadvanced;
 
-import android.graphics.PointF;
-import android.os.Bundle;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Toast;
-
-import com.davemorrissey.labs.subscaleview.ImageSource;
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.davemorrissey.labs.subscaleview.test.AbstractPagesActivity;
-import com.davemorrissey.labs.subscaleview.test.Page;
-import com.davemorrissey.labs.subscaleview.test.R.id;
-
-import java.util.Arrays;
-
 import static com.davemorrissey.labs.subscaleview.test.R.layout.pages_activity;
 import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p1_subtitle;
 import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p1_text;
@@ -27,6 +12,20 @@ import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p4
 import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p5_subtitle;
 import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_p5_text;
 import static com.davemorrissey.labs.subscaleview.test.R.string.advancedevent_title;
+
+import android.graphics.PointF;
+import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.widget.Toast;
+
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.davemorrissey.labs.subscaleview.test.AbstractPagesActivity;
+import com.davemorrissey.labs.subscaleview.test.Page;
+import com.davemorrissey.labs.subscaleview.test.R.id;
+
+import java.util.Arrays;
 
 public class AdvancedEventHandlingActivity extends AbstractPagesActivity {
 
@@ -79,12 +78,6 @@ public class AdvancedEventHandlingActivity extends AbstractPagesActivity {
         });
 
         imageView.setImage(ImageSource.asset(this, "sanmartino.jpg"));
-        imageView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return gestureDetector.onTouchEvent(motionEvent);
-            }
-        });
+        imageView.setOnTouchListener((view, motionEvent) -> gestureDetector.onTouchEvent(motionEvent));
     }
-
 }
