@@ -1,40 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.davemorrissey.labs.subscaleview.test"
-    android:hardwareAccelerated="true">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission
-        android:name="android.permission.READ_PHONE_STATE"
-        tools:node="remove" />
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        tools:node="remove" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app.name"
         android:theme="@style/sampleTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        android:hardwareAccelerated="true"
+        tools:ignore="DataExtractionRules,GoogleAppIndexingWarning">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app.name">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".basicfeatures.BasicFeaturesActivity" />
-        <activity android:name=".imagedisplay.ImageDisplayActivity" />
-        <activity android:name=".eventhandling.EventHandlingActivity" />
-        <activity android:name=".eventhandlingadvanced.AdvancedEventHandlingActivity" />
-        <activity android:name=".viewpager.ViewPagerActivity" />
-        <activity android:name=".animation.AnimationActivity" />
-        <activity android:name=".extension.ExtensionActivity" />
-        <activity android:name=".configuration.ConfigurationActivity" />
+        <activity
+            android:name=".basicfeatures.BasicFeaturesActivity"
+            android:exported="true" />
+        <activity
+            android:name=".imagedisplay.ImageDisplayActivity"
+            android:exported="false" />
+        <activity
+            android:name=".eventhandling.EventHandlingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".eventhandlingadvanced.AdvancedEventHandlingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".viewpager.ViewPagerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".animation.AnimationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".extension.ExtensionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".configuration.ConfigurationActivity"
+            android:exported="false" />
     </application>
 </manifest>
