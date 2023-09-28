@@ -78,7 +78,7 @@ public class ImageDecoder implements Decoder {
     public Bitmap decodeRegion(@NonNull Rect sRect, int sampleSize) {
         boolean config = getImageConfig();
 
-        Bitmap bitmap = decoder.decode(sRect, config, sampleSize);
+        Bitmap bitmap = decoder.decode(sRect, config, sampleSize, false, null);
 
         if (bitmap != null) {
             return bitmap;

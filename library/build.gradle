@@ -2,11 +2,11 @@ apply plugin: 'com.android.library'
 
 android {
     namespace "com.davemorrissey.labs.subscaleview"
-    compileSdkVersion 33
+    compileSdk = 34
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         versionCode = 1
         versionName = "1.0"
@@ -16,6 +16,6 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.6.0'
-    implementation 'com.github.tachiyomiorg:image-decoder:0d43783'
+    implementation 'androidx.annotation:annotation:1.7.0'
+    implementation 'com.github.tachiyomiorg:image-decoder:fbd6601290'
 }
