@@ -24,7 +24,7 @@ class ImageDisplayRotateFragment : Fragment() {
         binding.next.setOnClickListener { activity?.next() }
 
         binding.imageView.setImage(
-            ImageSource.asset(context, "swissroad.jpg")
+            ImageSource.asset(requireContext(), "swissroad.jpg")
         )
 
         return binding.root

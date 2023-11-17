@@ -27,7 +27,7 @@ class ViewPagerFragment : Fragment() {
             }
         }
         asset?.let {
-            binding.imageView.setImage(ImageSource.asset(context, it))
+            binding.imageView.setImage(ImageSource.asset(requireContext(), it))
         }
 
         return binding.root

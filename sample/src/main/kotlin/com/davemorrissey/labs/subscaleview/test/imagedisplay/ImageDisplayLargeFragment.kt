@@ -22,7 +22,7 @@ class ImageDisplayLargeFragment : Fragment() {
         val activity = activity as? ImageDisplayActivity
         binding.next.setOnClickListener { activity?.next() }
 
-        binding.imageView.setImage(ImageSource.asset(context, "card.png"))
+        binding.imageView.setImage(ImageSource.asset(requireContext(), "card.png"))
 
         return binding.root
     }

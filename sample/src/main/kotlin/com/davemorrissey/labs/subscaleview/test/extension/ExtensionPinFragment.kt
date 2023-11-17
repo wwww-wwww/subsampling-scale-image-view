@@ -23,7 +23,7 @@ class ExtensionPinFragment : Fragment() {
         val activity = activity as? ExtensionActivity
         binding.next.setOnClickListener { activity?.next() }
 
-        binding.imageView.setImage(ImageSource.asset(context, "sanmartino.jpg"))
+        binding.imageView.setImage(ImageSource.asset(requireContext(), "sanmartino.jpg"))
         binding.imageView.setPin(PointF(1602f, 405f))
 
         return binding.root

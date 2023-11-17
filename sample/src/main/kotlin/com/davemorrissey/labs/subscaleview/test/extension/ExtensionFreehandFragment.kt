@@ -23,7 +23,7 @@ class ExtensionFreehandFragment : Fragment() {
         binding.previous.setOnClickListener { activity?.previous() }
         binding.reset.setOnClickListener { binding.imageView.reset() }
 
-        binding.imageView.setImage(ImageSource.asset(context, "sanmartino.jpg"))
+        binding.imageView.setImage(ImageSource.asset(requireContext(), "sanmartino.jpg"))
 
         return binding.root
     }

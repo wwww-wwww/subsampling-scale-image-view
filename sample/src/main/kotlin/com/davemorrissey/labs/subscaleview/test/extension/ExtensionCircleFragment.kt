@@ -23,7 +23,7 @@ class ExtensionCircleFragment : Fragment() {
         binding.previous.setOnClickListener { activity?.previous() }
         binding.next.setOnClickListener { activity?.next() }
 
-        binding.imageView.setImage(ImageSource.asset(context, "sanmartino.jpg"))
+        binding.imageView.setImage(ImageSource.asset(requireContext(), "sanmartino.jpg"))
 
         return binding.root
     }

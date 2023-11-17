@@ -24,7 +24,7 @@ class ImageDisplayRegionFragment : Fragment() {
         binding.previous.setOnClickListener { activity?.previous() }
 
         binding.imageView.setImage(
-            ImageSource.asset(context, "card.png").region(Rect(5200, 651, 8200, 3250))
+            ImageSource.asset(requireContext(), "card.png").region(Rect(5200, 651, 8200, 3250))
         )
 
         return binding.root

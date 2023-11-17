@@ -934,6 +934,7 @@ public class SubsamplingScaleImageView extends View {
                     for (Tile tile : tileMapEntry.getValue()) {
                         if (tile.visible && (tile.loading || tile.bitmap == null)) {
                             hasMissingTiles = true;
+                            break;
                         }
                     }
                 }
@@ -1292,9 +1293,9 @@ public class SubsamplingScaleImageView extends View {
         float scaleHeight = scale * sHeight;
 
         boolean extra = panLimit == PAN_LIMIT_INSIDE;
-        float extraLeft   = extra ? vExtraSpaceLeft : 0;
-        float extraRight  = extra ? vExtraSpaceRight : 0;
-        float extraTop    = extra ? vExtraSpaceTop : 0;
+        float extraLeft = extra ? vExtraSpaceLeft : 0;
+        float extraRight = extra ? vExtraSpaceRight : 0;
+        float extraTop = extra ? vExtraSpaceTop : 0;
         float extraBottom = extra ? vExtraSpaceBottom : 0;
 
         if (panLimit == PAN_LIMIT_CENTER && isReady()) {
@@ -2068,9 +2069,10 @@ public class SubsamplingScaleImageView extends View {
      * Extra space also lowers minScale.
      * Extra space is zoom-agnostic thus constant in terms of view pixels not source pixels.
      * Extra space is respected only in {@link #PAN_LIMIT_INSIDE} pan mode and ignored in others.
-     * @param vLeft extra space on the left
-     * @param vTop extra space on the top
-     * @param vRight extra space on the right
+     *
+     * @param vLeft   extra space on the left
+     * @param vTop    extra space on the top
+     * @param vRight  extra space on the right
      * @param vBottom extra space on the bottom
      */
     public void setExtraSpace(float vLeft, float vTop, float vRight, float vBottom) {
@@ -2082,6 +2084,7 @@ public class SubsamplingScaleImageView extends View {
 
     /**
      * Returns extra space for the view contained in {@link RectF}.
+     *
      * @return extra space for all sides of view in view pixels
      */
     public RectF getExtraSpace() {
@@ -2089,8 +2092,8 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * @see #setExtraSpace(float, float, float, float)
      * @return left extra space in view pixels
+     * @see #setExtraSpace(float, float, float, float)
      */
     public float getExtraSpaceLeft() {
         return vExtraSpaceLeft;
@@ -2098,6 +2101,7 @@ public class SubsamplingScaleImageView extends View {
 
     /**
      * Sets left extra space for the view in view pixels.
+     *
      * @see #setExtraSpace(float, float, float, float)
      */
     public void setExtraSpaceLeft(float vLeft) {
@@ -2105,8 +2109,8 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * @see #setExtraSpace(float, float, float, float)
      * @return top extra space in view pixels
+     * @see #setExtraSpace(float, float, float, float)
      */
     public float getExtraSpaceTop() {
         return vExtraSpaceTop;
@@ -2114,6 +2118,7 @@ public class SubsamplingScaleImageView extends View {
 
     /**
      * Sets top extra space for the view in view pixels.
+     *
      * @see #setExtraSpace(float, float, float, float)
      */
     public void setExtraSpaceTop(float vTop) {
@@ -2121,8 +2126,8 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * @see #setExtraSpace(float, float, float, float)
      * @return right extra space in view pixels
+     * @see #setExtraSpace(float, float, float, float)
      */
     public float getExtraSpaceRight() {
         return vExtraSpaceRight;
@@ -2130,6 +2135,7 @@ public class SubsamplingScaleImageView extends View {
 
     /**
      * Sets right extra space for the view in view pixels.
+     *
      * @see #setExtraSpace(float, float, float, float)
      */
     public void setExtraSpaceRight(float vRight) {
@@ -2137,8 +2143,8 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * @see #setExtraSpace(float, float, float, float)
      * @return bottom extra space in view pixels
+     * @see #setExtraSpace(float, float, float, float)
      */
     public float getExtraSpaceBottom() {
         return vExtraSpaceBottom;
@@ -2146,6 +2152,7 @@ public class SubsamplingScaleImageView extends View {
 
     /**
      * Sets bottom extra space for the view in view pixels.
+     *
      * @see #setExtraSpace(float, float, float, float)
      */
     public void setExtraSpaceBottom(float vBottom) {
@@ -3026,4 +3033,6 @@ public class SubsamplingScaleImageView extends View {
             invalidate();
         }
     }
+
+
 }
