@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="sampleTheme" parent="@android:style/Theme.Holo">
+    <style name="sampleTheme" parent="Theme.AppCompat">
         <item name="android:actionBarStyle">@style/sampleActionBar</item>
         <item name="android:windowBackground">@color/background</item>
     </style>
 
-    <style name="sampleActionBar" parent="@android:style/Widget.Holo.ActionBar">
+    <style name="sampleActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:background">@color/actionBarBackground</item>
     </style>
 
