@@ -28,8 +28,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.davemorrissey.labs.subscaleview.R.styleable;
+import com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder;
 import com.davemorrissey.labs.subscaleview.decoder.Decoder;
-import com.davemorrissey.labs.subscaleview.decoder.ImageDecoder;
 import com.davemorrissey.labs.subscaleview.provider.InputProvider;
 
 import java.lang.ref.WeakReference;
@@ -219,7 +219,7 @@ public class SubsamplingScaleImageView extends View {
     private GestureDetector detector;
     private GestureDetector singleDetector;
     // Tile and image decoding
-    private Decoder decoder;
+    private ImageRegionDecoder decoder;
     // Debug values
     private PointF vCenterStart;
     private float vDistStart;
@@ -303,7 +303,7 @@ public class SubsamplingScaleImageView extends View {
     }
 
     /**
-     * Get the current preferred configuration for decoding bitmaps. {@link Decoder}
+     * Get the current preferred configuration for decoding bitmaps. {@link ImageRegionDecoder}
      * instances can read this and use it when decoding images.
      *
      * @return the preferred bitmap configuration, or null if none has been set.
@@ -314,7 +314,7 @@ public class SubsamplingScaleImageView extends View {
 
     /**
      * Set a global preferred bitmap config shared by all view instances and applied to new instances
-     * initialised after the call is made. This is a hint only; the bundled {@link Decoder}
+     * initialised after the call is made. This is a hint only; the bundled {@link ImageRegionDecoder}
      * classes all respect this (except when they were constructed with
      * an instance-specific config) but custom decoder classes will not.
      *
@@ -1410,7 +1410,7 @@ public class SubsamplingScaleImageView extends View {
     /**
      * Called by worker task when decoder is ready and image size and EXIF orientation is known.
      */
-    private synchronized void onTilesInited(Decoder decoder, int sWidth, int sHeight) {
+    private synchronized void onTilesInited(ImageRegionDecoder decoder, int sWidth, int sHeight) {
         debug("onTilesInited sWidth=%d, sHeight=%d", sWidth, sHeight);
         // If actual dimensions don't match the declared size, reset everything.
         if (this.sWidth > 0 && this.sHeight > 0 && (this.sWidth != sWidth || this.sHeight != sHeight)) {
@@ -2416,7 +2416,7 @@ public class SubsamplingScaleImageView extends View {
      * strongly recommended to use a single executor instance for the life of your application, not
      * one per view instance.
      * </p><p>
-     * <b>Warning:</b> If you are using a custom implementation of {@link Decoder}, and you
+     * <b>Warning:</b> If you are using a custom implementation of {@link ImageRegionDecoder}, and you
      * supply an executor with more than one thread, you must make sure your implementation supports
      * multi-threaded bitmap decoding or has appropriate internal synchronization. From SDK 21, Android's
      * {@link android.graphics.BitmapRegionDecoder} uses an internal lock so it is thread safe but
@@ -2655,7 +2655,7 @@ public class SubsamplingScaleImageView extends View {
         private final WeakReference<SubsamplingScaleImageView> viewRef;
         private final WeakReference<Context> contextRef;
         private final WeakReference<InputProvider> providerRef;
-        private Decoder decoder;
+        private ImageRegionDecoder decoder;
         private Exception exception;
 
         TilesInitTask(SubsamplingScaleImageView view, Context context, InputProvider provider) {
@@ -2672,7 +2672,7 @@ public class SubsamplingScaleImageView extends View {
                 InputProvider provider = providerRef.get();
                 if (context != null && view != null && provider == view.provider) {
                     view.debug("TilesInitTask.doInBackground");
-                    decoder = new ImageDecoder(view.cropBorders);
+                    decoder = new Decoder(view.cropBorders);
                     Point dimensions = decoder.init(context, provider);
                     int sWidth = dimensions.x;
                     int sHeight = dimensions.y;
@@ -2712,11 +2712,11 @@ public class SubsamplingScaleImageView extends View {
      */
     private static class TileLoadTask extends AsyncTask<Void, Void, Bitmap> {
         private final WeakReference<SubsamplingScaleImageView> viewRef;
-        private final WeakReference<Decoder> decoderRef;
+        private final WeakReference<ImageRegionDecoder> decoderRef;
         private final WeakReference<Tile> tileRef;
         private Exception exception;
 
-        TileLoadTask(SubsamplingScaleImageView view, Decoder decoder, Tile tile) {
+        TileLoadTask(SubsamplingScaleImageView view, ImageRegionDecoder decoder, Tile tile) {
             this.viewRef = new WeakReference<>(view);
             this.decoderRef = new WeakReference<>(decoder);
             this.tileRef = new WeakReference<>(tile);
@@ -2727,7 +2727,7 @@ public class SubsamplingScaleImageView extends View {
         protected Bitmap doInBackground(Void... params) {
             try {
                 SubsamplingScaleImageView view = viewRef.get();
-                Decoder decoder = decoderRef.get();
+                ImageRegionDecoder decoder = decoderRef.get();
                 Tile tile = tileRef.get();
                 if (decoder != null && tile != null && view != null && decoder.isReady() && tile.visible) {
                     view.debug("TileLoadTask.doInBackground, tile.sRect=%s, tile.sampleSize=%d", tile.sRect, tile.sampleSize);

@@ -4,12 +4,33 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Point
 import android.graphics.Rect
+import android.util.Log
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.davemorrissey.labs.subscaleview.provider.InputProvider
+import tachiyomi.decoder.ImageDecoder
+import tachiyomi.decoder.ImageDecoder.Companion.newInstance
 
-/**
- * Interface for image decoding classes.
- */
-interface Decoder {
+class Decoder(
+    bitmapConfig: Bitmap.Config?,
+    private val cropBorders: Boolean,
+) : ImageRegionDecoder {
+
+    private var bitmapConfig: Bitmap.Config? = null
+    private var decoder: ImageDecoder? = null
+
+    private val imageConfig: Boolean
+        /**
+         * Returns image config from subsampling view configuration.
+         */
+        get() = bitmapConfig == null || bitmapConfig != Bitmap.Config.ARGB_8888
+
+    constructor(cropBorders: Boolean) : this(null, cropBorders)
+
+    init {
+        this.bitmapConfig = bitmapConfig
+            ?: SubsamplingScaleImageView.getPreferredBitmapConfig()
+            ?: Bitmap.Config.RGB_565
+    }
 
     /**
      * Initialise the decoder. When possible, perform initial setup work once in this method. The
@@ -20,7 +41,19 @@ interface Decoder {
      * @return Dimensions of the image.
      * @throws Exception if initialisation fails.
      */
-    fun init(context: Context, provider: InputProvider): Point
+    override fun init(context: Context, provider: InputProvider): Point {
+        try {
+            provider.openStream().use { inputStream ->
+                decoder = newInstance(inputStream!!, cropBorders)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to init decoder", e)
+        }
+        if (decoder == null) {
+            error("Image decoder failed to initialize and get image size")
+        }
+        return Point(decoder!!.width, decoder!!.height)
+    }
 
     /**
      * Decode a region of the image with the given sample size. This method is called off the UI
@@ -34,18 +67,27 @@ interface Decoder {
      * @param sampleSize Sample size.
      * @return The decoded region. It is safe to return null if decoding fails.
      */
-    fun decodeRegion(sRect: Rect, sampleSize: Int): Bitmap
+    override fun decodeRegion(sRect: Rect, sampleSize: Int): Bitmap {
+        val bitmap = decoder?.decode(sRect, imageConfig, sampleSize, false, null)
+        return bitmap ?: error("Null region bitmap")
+    }
 
     /**
      * Status check. Should return false before initialisation and after recycle.
      *
      * @return true if the decoder is ready to be used.
      */
-    fun isReady(): Boolean
+    override fun isReady(): Boolean {
+        return decoder != null && !decoder!!.isRecycled
+    }
 
     /**
      * This method will be called when the decoder is no longer required. It should clean up any
      * resources still in use.
      */
-    fun recycle()
+    override fun recycle() {
+        decoder?.recycle()
+    }
 }
+
+private val TAG = Decoder::class.java.simpleName
