@@ -1,7 +1,10 @@
 plugins {
     id("com.android.library")
     kotlin("android")
+    id("maven-publish")
 }
+
+group = "a"
 
 android {
     namespace = "com.davemorrissey.labs.subscaleview"
@@ -29,4 +32,18 @@ android {
 dependencies {
     implementation("androidx.annotation:annotation:1.7.0")
     implementation("com.github.tachiyomiorg:image-decoder:fbd6601290")
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                groupId = "a"
+                artifactId = "subsample-view"
+                version = "1.0"
+
+                from(components.findByName("release"))
+            }
+        }
+    }
 }
