@@ -16,21 +16,6 @@ The view optionally uses subsampling and tiles to support very large images - a 
 * [Event handling](https://github.com/davemorrissey/subsampling-scale-image-view/wiki/09.-Events)
 * [Animation](https://github.com/davemorrissey/subsampling-scale-image-view/wiki/08.-Animation)
 * [Extension](https://github.com/davemorrissey/subsampling-scale-image-view/wiki/10.-Extension)
-* [Reference (JavaDocs)](http://davemorrissey.github.io/subsampling-scale-image-view/javadoc/)
-
-#### Migration guides
-
-Versions 3.9.0, 3.8.0 and 3.0.0 contain breaking changes. Migration instructions can be found [in the wiki](https://github.com/davemorrissey/subsampling-scale-image-view/wiki/X.--Migration-guides).
-
-#### Download the sample app
-
-[![Get it on Google Play](docs/images/google_play.png)](https://play.google.com/store/apps/details?id=com.davemorrissey.labs.subscaleview.sample)
-
-[Kotlin Sample App on GitHub](https://github.com/davemorrissey/ssiv-kotlin-sample)
-
-#### Demo
-
-![Demo](docs/images/demo.gif)
 
 ## Features
 
@@ -83,16 +68,14 @@ Versions 3.9.0, 3.8.0 and 3.0.0 contain breaking changes. Migration instructions
 **1)** Add this library as a dependency in your app's build.gradle file.
 
 ```gradle
-dependencies {
-    implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
+repositories {
+    // ... Your other repos...
+    
+    maven(url = "https://www.jitpack.io")
 }
-```
-
-If your project uses AndroidX, change the artifact name as follows:
-
-```gradle
+    
 dependencies {
-    implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
+    implementation("com.github.tachiyomiorg:subsampling-scale-image-view:<commit-sha>")
 }
 ```
 
