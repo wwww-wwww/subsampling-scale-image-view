@@ -27,6 +27,6 @@ android {
 }
 
 dependencies {
-    implementation("androidx.annotation:annotation:1.7.0")
-    implementation("com.github.tachiyomiorg:image-decoder:fbd6601290")
+    implementation("androidx.annotation:annotation:1.7.1")
+    implementation("com.github.tachiyomiorg:image-decoder:398d3c074f")
 }
