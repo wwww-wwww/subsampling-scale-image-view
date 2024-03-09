@@ -5,32 +5,15 @@ import android.graphics.Bitmap
 import android.graphics.Point
 import android.graphics.Rect
 import android.util.Log
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.davemorrissey.labs.subscaleview.provider.InputProvider
 import tachiyomi.decoder.ImageDecoder
 import tachiyomi.decoder.ImageDecoder.Companion.newInstance
 
 class Decoder(
-    bitmapConfig: Bitmap.Config?,
     private val cropBorders: Boolean,
 ) : ImageRegionDecoder {
 
-    private var bitmapConfig: Bitmap.Config? = null
     private var decoder: ImageDecoder? = null
-
-    private val imageConfig: Boolean
-        /**
-         * Returns image config from subsampling view configuration.
-         */
-        get() = bitmapConfig == null || bitmapConfig != Bitmap.Config.ARGB_8888
-
-    constructor(cropBorders: Boolean) : this(null, cropBorders)
-
-    init {
-        this.bitmapConfig = bitmapConfig
-            ?: SubsamplingScaleImageView.getPreferredBitmapConfig()
-            ?: Bitmap.Config.RGB_565
-    }
 
     /**
      * Initialise the decoder. When possible, perform initial setup work once in this method. The
@@ -68,7 +51,7 @@ class Decoder(
      * @return The decoded region. It is safe to return null if decoding fails.
      */
     override fun decodeRegion(sRect: Rect, sampleSize: Int): Bitmap {
-        val bitmap = decoder?.decode(sRect, imageConfig, sampleSize, false, null)
+        val bitmap = decoder?.decode(sRect, sampleSize)
         return bitmap ?: error("Null region bitmap")
     }
 

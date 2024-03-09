@@ -28,5 +28,5 @@ android {
 
 dependencies {
     implementation("androidx.annotation:annotation:1.7.1")
-    implementation("com.github.tachiyomiorg:image-decoder:398d3c074f")
+    implementation("com.github.tachiyomiorg:image-decoder:e08e9be535")
 }
