@@ -32,9 +32,9 @@ class AnimationActivity : AbstractPagesActivity(
 
     override fun onPageChanged(page: Int) {
         if (page == 2) {
-            view!!.setPanLimit(SubsamplingScaleImageView.PAN_LIMIT_CENTER)
+            view?.setPanLimit(SubsamplingScaleImageView.PAN_LIMIT_CENTER)
         } else {
-            view!!.setPanLimit(SubsamplingScaleImageView.PAN_LIMIT_INSIDE)
+            view?.setPanLimit(SubsamplingScaleImageView.PAN_LIMIT_INSIDE)
         }
     }
 

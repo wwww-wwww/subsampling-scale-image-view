@@ -28,8 +28,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.davemorrissey.labs.subscaleview.R.styleable;
-import com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder;
 import com.davemorrissey.labs.subscaleview.decoder.Decoder;
+import com.davemorrissey.labs.subscaleview.decoder.ImageRegionDecoder;
 import com.davemorrissey.labs.subscaleview.provider.InputProvider;
 
 import java.lang.ref.WeakReference;
@@ -270,7 +270,7 @@ public class SubsamplingScaleImageView extends View {
             TypedArray typedAttr = getContext().obtainStyledAttributes(attr, styleable.SubsamplingScaleImageView);
             if (typedAttr.hasValue(styleable.SubsamplingScaleImageView_assetName)) {
                 String assetName = typedAttr.getString(styleable.SubsamplingScaleImageView_assetName);
-                if (assetName != null && assetName.length() > 0) {
+                if (assetName != null && !assetName.isEmpty()) {
                     setImage(ImageSource.asset(context, assetName));
                 }
             }
@@ -486,7 +486,7 @@ public class SubsamplingScaleImageView extends View {
 
         singleDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
-            public boolean onSingleTapConfirmed(MotionEvent e) {
+            public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
                 performClick();
                 return true;
             }
@@ -1144,9 +1144,11 @@ public class SubsamplingScaleImageView extends View {
         initialiseTileMap(maxTileDimensions);
 
         List<Tile> baseGrid = tileMap.get(fullImageSampleSize);
-        for (Tile baseTile : baseGrid) {
-            TileLoadTask task = new TileLoadTask(this, decoder, baseTile);
-            execute(task);
+        if (baseGrid != null) {
+            for (Tile baseTile : baseGrid) {
+                TileLoadTask task = new TileLoadTask(this, decoder, baseTile);
+                execute(task);
+            }
         }
         refreshRequiredTiles(true);
     }
@@ -1855,14 +1857,11 @@ public class SubsamplingScaleImageView extends View {
      * @return Current value
      */
     private float ease(int type, long time, float from, float change, long duration) {
-        switch (type) {
-            case EASE_IN_OUT_QUAD:
-                return easeInOutQuad(time, from, change, duration);
-            case EASE_OUT_QUAD:
-                return easeOutQuad(time, from, change, duration);
-            default:
-                throw new IllegalStateException("Unexpected easing type: " + type);
-        }
+        return switch (type) {
+            case EASE_IN_OUT_QUAD -> easeInOutQuad(time, from, change, duration);
+            case EASE_OUT_QUAD -> easeOutQuad(time, from, change, duration);
+            default -> throw new IllegalStateException("Unexpected easing type: " + type);
+        };
     }
 
     /**
@@ -2229,7 +2228,6 @@ public class SubsamplingScaleImageView extends View {
      */
     @SuppressWarnings("EmptyMethod")
     protected void onReady() {
-
     }
 
     /**
@@ -3033,6 +3031,4 @@ public class SubsamplingScaleImageView extends View {
             invalidate();
         }
     }
-
-
 }

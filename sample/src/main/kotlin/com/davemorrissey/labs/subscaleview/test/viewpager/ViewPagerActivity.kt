@@ -34,7 +34,7 @@ class ViewPagerActivity : AbstractPagesActivity(
         if (viewPager.currentItem == 0) {
             super.onBackPressed()
         } else {
-            viewPager.currentItem = viewPager.currentItem - 1
+            viewPager.currentItem -= 1
         }
     }
 

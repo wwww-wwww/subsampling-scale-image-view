@@ -19,13 +19,13 @@ abstract class AbstractPagesActivity protected constructor(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(layout)
-        val actionBar = actionBar
-        if (actionBar != null) {
-            actionBar.title = getString(title)
-            actionBar.setDisplayHomeAsUpEnabled(true)
-        }
+
+        actionBar?.title = getString(title)
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+
         findViewById<View>(id.next).setOnClickListener { next() }
         findViewById<View>(id.previous).setOnClickListener { previous() }
+
         if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_PAGE)) {
             page = savedInstanceState.getInt(BUNDLE_PAGE)
         }
@@ -62,7 +62,7 @@ abstract class AbstractPagesActivity protected constructor(
         }
         val actionBar = actionBar
         actionBar?.setSubtitle(notes[page].subtitle)
-        (findViewById<View>(id.note) as TextView).setText(notes[page].text)
+        findViewById<TextView>(id.note).setText(notes[page].text)
         findViewById<View>(id.next).visibility =
             if (page >= notes.size - 1) View.INVISIBLE else View.VISIBLE
         findViewById<View>(id.previous).visibility =
