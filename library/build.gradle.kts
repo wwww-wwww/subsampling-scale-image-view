@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     kotlin("android")
+    `maven-publish`
 }
 
 android {
@@ -27,6 +28,27 @@ android {
 }
 
 dependencies {
-    implementation("androidx.annotation:annotation:1.7.1")
-    implementation("com.github.tachiyomiorg:image-decoder:e08e9be535")
+    implementation(libs.androidx.annotation)
+    api(libs.image.decoder)
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                groupId = "com.github.tachiyomiorg"
+                artifactId = "subsampling-scale-image-view"
+                version = "4.0.0"
+
+                from(components["release"])
+            }
+        }
+
+        repositories {
+            maven {
+                name = "jitpack"
+                url = uri("https://jitpack.io")
+            }
+        }
+    }
 }

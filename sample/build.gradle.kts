@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.davemorrissey.labs.subscaleview.test"
-        minSdk = 21
+        minSdk = 24
         targetSdk = 34
 
         versionCode = 4
@@ -45,6 +45,7 @@ android {
 
 dependencies {
     implementation(project(":library"))
-    implementation("androidx.appcompat:appcompat:1.7.0-alpha03")
-    implementation("androidx.viewpager:viewpager:1.1.0-alpha01")
+
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.viewpager)
 }
