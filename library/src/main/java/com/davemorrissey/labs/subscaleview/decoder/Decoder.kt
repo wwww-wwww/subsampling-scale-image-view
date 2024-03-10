@@ -11,6 +11,7 @@ import tachiyomi.decoder.ImageDecoder.Companion.newInstance
 
 class Decoder(
     private val cropBorders: Boolean,
+    private val displayProfile: ByteArray,
 ) : ImageRegionDecoder {
 
     private var decoder: ImageDecoder? = null
@@ -27,7 +28,7 @@ class Decoder(
     override fun init(context: Context, provider: InputProvider): Point {
         try {
             provider.openStream().use { inputStream ->
-                decoder = newInstance(inputStream!!, cropBorders)
+                decoder = newInstance(inputStream!!, cropBorders, displayProfile)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to init decoder", e)
