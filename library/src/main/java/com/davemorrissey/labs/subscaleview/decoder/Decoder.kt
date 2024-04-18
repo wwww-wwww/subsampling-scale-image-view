@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Point
 import android.graphics.Rect
+import android.os.Build
 import android.util.Log
 import com.davemorrissey.labs.subscaleview.provider.InputProvider
 import tachiyomi.decoder.ImageDecoder
@@ -52,7 +53,10 @@ class Decoder(
      * @return The decoded region. It is safe to return null if decoding fails.
      */
     override fun decodeRegion(sRect: Rect, sampleSize: Int): Bitmap {
-        val bitmap = decoder?.decode(sRect, sampleSize)
+        var bitmap = decoder?.decode(sRect, sampleSize)
+        if (Build.VERSION.SDK_INT >= 26) {
+            bitmap = bitmap?.copy(Bitmap.Config.HARDWARE, false)
+        }
         return bitmap ?: error("Null region bitmap")
     }
 
