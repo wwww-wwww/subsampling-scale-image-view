@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.davemorrissey.labs.subscaleview.test"
-        minSdk = 26
+        minSdk = 21
         targetSdk = 34
 
         versionCode = 4
