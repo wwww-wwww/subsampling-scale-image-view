@@ -53,9 +53,9 @@ class Decoder(
      * @return The decoded region. It is safe to return null if decoding fails.
      */
     override fun decodeRegion(sRect: Rect, sampleSize: Int): Bitmap {
-        var bitmap = decoder?.decode(sRect, sampleSize)
+        val bitmap = decoder?.decode(sRect, sampleSize)
         if (Build.VERSION.SDK_INT >= 26) {
-            bitmap = bitmap?.copy(Bitmap.Config.HARDWARE, false)
+            bitmap?.copy(Bitmap.Config.HARDWARE, false)?.let { return it; }
         }
         return bitmap ?: error("Null region bitmap")
     }
