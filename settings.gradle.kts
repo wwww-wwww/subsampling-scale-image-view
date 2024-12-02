@@ -10,17 +10,21 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         google()
-        mavenCentral()
-        maven(url = "https://www.jitpack.io")
     }
 }
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        mavenCentral()
         google()
-        maven(url = "https://www.jitpack.io")
+        mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/wwww-wwww/image-decoder")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 

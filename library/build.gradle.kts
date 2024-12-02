@@ -34,20 +34,22 @@ dependencies {
 
 afterEvaluate {
     publishing {
-        publications {
-            create<MavenPublication>("release") {
-                groupId = "com.github.tachiyomiorg"
-                artifactId = "subsampling-scale-image-view"
-                version = "4.0.0"
-
-                from(components["release"])
-            }
-        }
-
         repositories {
             maven {
-                name = "jitpack"
-                url = uri("https://jitpack.io")
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/wwww-wwww/image-decoder")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
+        publications {
+            register<MavenPublication>("gpr") {
+                from(components["release"])
+                groupId = "dev.mihon"
+                artifactId = "subsampling-scale-image-view"
+                version = "4.0.0"
             }
         }
     }

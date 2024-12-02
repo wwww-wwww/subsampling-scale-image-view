@@ -7,8 +7,8 @@ import android.graphics.Rect
 import android.os.Build
 import android.util.Log
 import com.davemorrissey.labs.subscaleview.provider.InputProvider
-import tachiyomi.decoder.ImageDecoder
-import tachiyomi.decoder.ImageDecoder.Companion.newInstance
+import dev.mihon.image.decoder.ImageDecoder
+import dev.mihon.image.decoder.ImageDecoder.Companion.newInstance
 
 class Decoder(
     private val cropBorders: Boolean,
